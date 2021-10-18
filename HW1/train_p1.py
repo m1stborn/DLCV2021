@@ -21,7 +21,7 @@ if __name__ == '__main__':
     parser = create_parser()
     configs = parser.parse_args()
 
-    uid = uuid.uuid1()
+    uid = str(uuid.uuid1())
     best_epoch = 0
     pre_val_acc = 0.0
 
@@ -122,4 +122,4 @@ if __name__ == '__main__':
             pre_val_acc = correct / total
             best_epoch = epoch
 
-    experiment_record(str(uid), time.ctime(), best_epoch, pre_val_acc)
+    experiment_record(uid, time.ctime(), best_epoch, pre_val_acc)
