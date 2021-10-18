@@ -18,7 +18,7 @@ def create_parser():
     parser.add_argument(
         '--ckpt',
         type=str,
-        default='./ckpt/',
+        default='./ckpt/vgg16.pt',
         help='Path to checkpoint to resume training. (default: "")'
     )
     parser.add_argument(
@@ -31,13 +31,13 @@ def create_parser():
         '--epochs',
         type=int,
         default=20,
-        help='Number of training epochs. (default: 2)'
+        help='Number of training epochs. (default: 20)'
     )
     parser.add_argument(
         '--batch_size',
         type=int,
         default=32,
-        help='Batch size for data loaders. (default: 4)'
+        help='Batch size for data loaders. (default: 32)'
     )
     parser.add_argument(
         '--num_workers',
