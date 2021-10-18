@@ -118,7 +118,7 @@ if __name__ == '__main__':
                 'epoch': epoch,
                 'optim': optimizer.state_dict()
             }
-            save_checkpoint(checkpoint, configs.ckpt)
+            save_checkpoint(checkpoint, configs.ckpt_path+"vgg16-{}.pt".format(uid[:8]))
             pre_val_acc = correct / total
             best_epoch = epoch
 

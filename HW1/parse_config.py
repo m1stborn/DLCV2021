@@ -22,7 +22,7 @@ def create_parser():
         help='Path to checkpoint to resume training. (default: "")'
     )
     parser.add_argument(
-        '--path_to_checkpoint',
+        '--ckpt_path',
         type=str,
         default='./ckpt/',
         help='Path for saving checkpoint. (default: "./ckpt/")'
