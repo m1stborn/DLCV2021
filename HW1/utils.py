@@ -26,3 +26,14 @@ def progress_bar(count, total, prefix='', suffix=''):
 
     if count == total:
         print("\n")
+
+
+def experiment_record(*args):
+    with open("./ckpt/log.txt", 'a') as f:
+        print("""============================================
+UUID: {},
+Time: {},
+Result:
+    Epoch: {},
+    Valid ACC: {},
+============================================""".format(*args))

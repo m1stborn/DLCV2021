@@ -1,3 +1,5 @@
+import time
+import uuid
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -8,7 +10,7 @@ from model_p1.pretrained_vgg16 import PretrainedVGG16
 from model_p1.vgg16_batchnorm import VGG16BN
 from model_p1.image_dataset import ImageDataset
 from parse_config import create_parser
-from utils import save_checkpoint, load_checkpoint, progress_bar
+from utils import save_checkpoint, load_checkpoint, progress_bar, experiment_record
 
 # step 0: fix random seed for reproducibility
 torch.manual_seed(1)
@@ -18,6 +20,10 @@ if __name__ == '__main__':
     # init constants:
     parser = create_parser()
     configs = parser.parse_args()
+
+    uid = uuid.uuid1()
+    best_epoch = 0
+    pre_val_acc = 0.0
 
     # step 1: prepare dataset
     train_transforms = transforms.Compose([
@@ -48,13 +54,11 @@ if __name__ == '__main__':
 
     # step 3: define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
-    # optimizer = torch.optim.Adam(net.parameters(), lr=configs.lr)
     optimizer = torch.optim.SGD(net.parameters(), lr=configs.lr, momentum=0.9)
 
     # step 4: check if resume training
     start_epoch = 0
     if configs.resume:
-        # net.load_state_dict(torch.load(configs.ckpt))
         ckpt = load_checkpoint(configs.ckpt)
         net.load_state_dict(ckpt['net'])
         start_epoch = ckpt['epoch'] + 1
@@ -73,7 +77,6 @@ if __name__ == '__main__':
 
     # step 6: main loop
     for epoch in range(start_epoch, start_epoch + configs.epochs):
-        pre_val_acc = 0.0
         running_loss = 0.0
         for i, data in enumerate(train_dataloader):
             inputs, labels = data[0].to(device), data[1].to(device)
@@ -91,16 +94,10 @@ if __name__ == '__main__':
             running_loss += loss.item()
             prefix = 'Epoch [{}/{}]-'.format(epoch + 1, start_epoch + configs.epochs)
             if (i + 1) % 10 == 0:  # print every 10 mini-batches
-                # print('Epoch [{}/{}], Step [{}/{}], Train Loss: {:.4f}'
-                #       .format(epoch + 1, start_epoch + configs.epochs, i + 1, total_steps, loss.item()))
                 suffix = 'Train Loss: {:.4f}'.format(running_loss / (i + 1))
                 progress_bar(i + 1, total_steps, prefix, suffix)
             if configs.test_run:
                 break
-
-        # step 6: save the model
-        # torch.save(net.state_dict(), configs.path_to_checkpoint + "vgg16_fine_tuned-{}.pt"
-        #            .format(epoch))
 
         # print Valid Accuracy per epoch
         correct = 0
@@ -114,7 +111,7 @@ if __name__ == '__main__':
         print('\nValid ACC: {:.4f}'
               .format(correct / total))
 
-        # save checkpoint if better than previous
+        # step 6: save checkpoint if better than previous
         if pre_val_acc < (correct / total):
             checkpoint = {
                 'net': net.state_dict(),
@@ -123,3 +120,6 @@ if __name__ == '__main__':
             }
             save_checkpoint(checkpoint, configs.ckpt)
             pre_val_acc = correct / total
+            best_epoch = epoch
+
+    experiment_record(str(uid), time.ctime(), best_epoch, pre_val_acc)
