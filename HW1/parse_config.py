@@ -36,7 +36,7 @@ def create_parser():
     parser.add_argument(
         '--batch_size',
         type=int,
-        default=32,
+        default=64,
         help='Batch size for data loaders. (default: 32)'
     )
     parser.add_argument(
