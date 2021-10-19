@@ -21,7 +21,7 @@ def progress_bar(count, total, prefix='', suffix=''):
     # percents = round(100.0 * count / float(total), 1)
     bar = '=' * filled_len + '-' * (bar_len - filled_len)
 
-    sys.stdout.write(prefix + '[%s]-Step[%s/%s] - %s\r' % (bar, count, total, suffix))
+    sys.stdout.write(prefix + '[%s]-Step [%s/%s]-%s\r' % (bar, count, total, suffix))
     sys.stdout.flush()
 
     if count == total:

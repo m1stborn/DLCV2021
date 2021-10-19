@@ -28,14 +28,15 @@ if __name__ == '__main__':
     # step 1: prepare dataset
     train_transforms = transforms.Compose([
         transforms.Resize(224),
-        # transforms.RandomResizedCrop(224),
+        transforms.RandomRotation(25),
+        transforms.RandomResizedCrop(224),
         # transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
     ])
     val_transforms = transforms.Compose([
-        transforms.Resize(224),
-        # transforms.CenterCrop(224),
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
     ])
@@ -63,6 +64,7 @@ if __name__ == '__main__':
         net.load_state_dict(ckpt['net'])
         start_epoch = ckpt['epoch'] + 1
         optimizer.load_state_dict(ckpt['optim'])
+        uid = ckpt['uid']
         for state in optimizer.state.values():
             for k, v in state.items():
                 if torch.is_tensor(v):
@@ -116,7 +118,8 @@ if __name__ == '__main__':
             checkpoint = {
                 'net': net.state_dict(),
                 'epoch': epoch,
-                'optim': optimizer.state_dict()
+                'optim': optimizer.state_dict(),
+                'uid': uid
             }
             save_checkpoint(checkpoint, configs.ckpt_path+"vgg16-{}.pt".format(uid[:8]))
             pre_val_acc = correct / total
