@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 from torchvision.transforms import transforms
 
 from model_p1.model import VGG16
+from model_p1.pretrained_resnet import PretrainedResnet
 from model_p1.pretrained_vgg16 import PretrainedVGG16
 from model_p1.vgg16_batchnorm import VGG16BN
 from model_p1.image_dataset import ImageDataset
@@ -28,7 +29,7 @@ if __name__ == '__main__':
     # step 1: prepare dataset
     train_transforms = transforms.Compose([
         transforms.Resize(224),
-        transforms.RandomRotation(25),
+        # transforms.RandomRotation(25),
         transforms.RandomResizedCrop(224),
         # transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
@@ -51,7 +52,7 @@ if __name__ == '__main__':
     total_steps = len(train_dataloader)
 
     # step 2: init network
-    net = PretrainedVGG16()
+    net = PretrainedResnet()
 
     # step 3: define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
