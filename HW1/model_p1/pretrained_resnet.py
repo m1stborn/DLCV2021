@@ -6,8 +6,11 @@ class PretrainedResnet(nn.Module):
     def __init__(self, num_classes=50):
         super(PretrainedResnet, self).__init__()
         model = models.resnet50(pretrained=True)
-        for param in model.parameters():
-            param.requires_grad = False
+        for name, child in model.named_children():
+            if name not in ['layer3', 'layer4']:
+                for param in child.parameters():
+                    param.requires_grad = False
+
         self.features = nn.Sequential(*list(model.children())[:-1])
 
         self.classifier = nn.Sequential(

@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     # step 3: define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(net.parameters(), lr=configs.lr, momentum=0.9)
+    optimizer = torch.optim.SGD(filter(lambda x: x.requires_grad, net.parameters()), lr=configs.lr, momentum=0.9)
 
     # step 4: check if resume training
     start_epoch = 0
