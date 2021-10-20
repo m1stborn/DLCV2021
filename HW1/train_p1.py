@@ -52,7 +52,7 @@ if __name__ == '__main__':
     total_steps = len(train_dataloader)
 
     # step 2: init network
-    net = PretrainedResnet()
+    net = PretrainedVGG16()
 
     # step 3: define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
