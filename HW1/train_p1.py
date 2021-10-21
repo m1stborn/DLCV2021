@@ -29,7 +29,7 @@ if __name__ == '__main__':
     # step 1: prepare dataset
     train_transforms = transforms.Compose([
         transforms.Resize(224),
-        # transforms.RandomRotation(25),
+        transforms.RandomRotation(25),
         # transforms.RandomResizedCrop(224),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
