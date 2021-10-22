@@ -5,14 +5,12 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision.transforms import transforms
 
-from model_p1.model import VGG16
-from model_p1.pretrained_resnet import PretrainedResnet
-from model_p1.pretrained_vgg16 import PretrainedVGG16
-from model_p1.vgg16_batchnorm import VGG16BN
-from model_p1.image_dataset import ImageDataset
+from model_p2.fcn32 import FCN32
+from model_p2.image_dataset import ImageDataset
+from model_p2.metrics import mean_iou_score
+from model_p2.metrics import IOU
 from parse_config import create_parser
 from utils import save_checkpoint, load_checkpoint, progress_bar, experiment_record
-
 # step 0: fix random seed for reproducibility
 torch.manual_seed(1)
 torch.cuda.manual_seed(1)
@@ -24,39 +22,26 @@ if __name__ == '__main__':
 
     uid = str(uuid.uuid1())
     best_epoch = 0
-    pre_val_acc = 0.0
+    pre_val_miou = 0.0
 
     # step 1: prepare dataset
-    train_transforms = transforms.Compose([
-        transforms.Resize(224),
-        transforms.RandomRotation(25),
-        # transforms.RandomResizedCrop(224),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
-    ])
-    val_transforms = transforms.Compose([
-        transforms.Resize(224),
-        # transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
-    ])
-
-    train_dataset = ImageDataset('./p1_data/train_50/', transform=train_transforms)
+    train_dataset = ImageDataset('./p2_data/train/')
     train_dataloader = DataLoader(train_dataset, batch_size=configs.batch_size,
                                   shuffle=True)
-    val_dataset = ImageDataset('./p1_data/val_50/', transform=val_transforms)
+
+    val_dataset = ImageDataset('./p2_data/validation/')
     val_dataloader = DataLoader(val_dataset, batch_size=configs.batch_size,
                                 shuffle=True)
 
     total_steps = len(train_dataloader)
 
     # step 2: init network
-    net = PretrainedResnet()
+    net = FCN32()
 
     # step 3: define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(filter(lambda x: x.requires_grad, net.parameters()), lr=configs.lr, momentum=0.9)
+    optimizer = torch.optim.Adam(net.parameters(), lr=configs.lr)
+    # optimizer = torch.optim.SGD(net.parameters(), lr=configs.lr, momentum=0.9)
 
     # step 4: check if resume training
     start_epoch = 0
@@ -102,31 +87,29 @@ if __name__ == '__main__':
             if configs.test_run:
                 break
 
-        # print Valid Accuracy per epoch
-        # TODO: with no grad?
+        # print Valid mIoU per epoch
         with torch.no_grad():
-            correct = 0
-            total = 0
+            val_metrics = IOU()
             for val_data in val_dataloader:
-                images, labels = val_data[0].to(device), val_data[1].to(device)
+                images, labels = val_data[0].to(device), val_data[1]
                 outputs = net(images)
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-            print('\nValid ACC: {:.4f}'
-                  .format(correct / total))
+                predicted = outputs.max(dim=1)[1].data.cpu().numpy()
+                val_metrics.batch_iou(predicted, labels.cpu().numpy())
 
-        # step 6: save checkpoint if better than previous
-        if pre_val_acc < (correct / total):
-            checkpoint = {
-                'net': net.state_dict(),
-                'epoch': epoch,
-                'optim': optimizer.state_dict(),
-                'uid': uid
-            }
-            save_checkpoint(checkpoint, configs.ckpt_path + "vgg16-{}.pt".format(uid[:8]))
-            pre_val_acc = correct / total
-            best_epoch = epoch
+            val_metrics.update()
+            print('\nValid mIoU: {:.4f}'
+                  .format(val_metrics.mean_iou))
+
+            if pre_val_miou < val_metrics.mean_iou:
+                checkpoint = {
+                    'net': net.state_dict(),
+                    'epoch': epoch,
+                    'optim': optimizer.state_dict(),
+                    'uid': uid
+                }
+                save_checkpoint(checkpoint, configs.ckpt_path + "vgg16FCN32-{}.pt".format(uid[:8]))
+                pre_val_miou = val_metrics.mean_iou
+                best_epoch = epoch
 
     # step 7: logging experiment
-    experiment_record(uid, time.ctime(), best_epoch, pre_val_acc)
+    experiment_record(uid, time.ctime(), best_epoch, pre_val_miou)

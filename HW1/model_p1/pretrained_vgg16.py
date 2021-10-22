@@ -29,5 +29,5 @@ class PretrainedVGG16(nn.Module):
         x = self.features(x)
         x = self.avgpool(x)
         x = x.view(x.size(0), 512 * 7 * 7)
-        out = self.classifier(x)
-        return out
+        x = self.classifier(x)
+        return x

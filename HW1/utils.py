@@ -24,12 +24,12 @@ def progress_bar(count, total, prefix='', suffix=''):
     sys.stdout.write(prefix + '[%s]-Step [%s/%s]-%s\r' % (bar, count, total, suffix))
     sys.stdout.flush()
 
-    if count == total:
-        print("\n")
+    # if count == total:
+    #     print("\n")
 
 
 def experiment_record(*args):
-    with open("./ckpt/log.txt", 'a') as f:
+    with open("./ckpt/p2/log.txt", 'a') as f:
         print("""============================================
 UUID: {}
 Time: {}

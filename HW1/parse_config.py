@@ -24,7 +24,7 @@ def create_parser():
     parser.add_argument(
         '--ckpt_path',
         type=str,
-        default='./ckpt/',
+        default='./ckpt/p2',
         help='Path for saving checkpoint. (default: "./ckpt/")'
     )
     parser.add_argument(
@@ -36,7 +36,7 @@ def create_parser():
     parser.add_argument(
         '--batch_size',
         type=int,
-        default=32,
+        default=16,
         help='Batch size for data loaders. (default: 32)'
     )
     parser.add_argument(
