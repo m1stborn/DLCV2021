@@ -7,8 +7,9 @@ class FCN32(nn.Module):
         super(FCN32, self).__init__()
         model = models.vgg16(pretrained=True)
         # TODO decide layer to freeze
-        for param in model.parameters():
-            param.requires_grad = False
+        for i in range(17):
+            for param in model.features[i].parameters():
+                param.requires_grad = False
         self.features = model.features  # output size [-1, 512, 16, 16]
 
         # self.avgpool = model.avgpool  # output size [-1, 512, 16, 16]
