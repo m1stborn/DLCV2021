@@ -1,3 +1,4 @@
+import os
 import time
 import uuid
 import torch
@@ -124,7 +125,8 @@ if __name__ == '__main__':
                 'optim': optimizer.state_dict(),
                 'uid': uid
             }
-            save_checkpoint(checkpoint, configs.ckpt_path + "vgg16-{}.pt".format(uid[:8]))
+            save_checkpoint(checkpoint,
+                            os.path.join(configs.ckpt_path, "vgg16-{}.pt".format(uid[:8])))
             pre_val_acc = correct / total
             best_epoch = epoch
 

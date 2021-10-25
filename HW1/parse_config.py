@@ -24,7 +24,7 @@ def create_parser():
     parser.add_argument(
         '--ckpt_path',
         type=str,
-        default='./ckpt/p2/',
+        default='./ckpt/p2',
         help='Path for saving checkpoint. (default: "./ckpt/")'
     )
     parser.add_argument(

@@ -1,3 +1,4 @@
+import os
 import time
 import uuid
 import torch
@@ -5,11 +6,9 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision.transforms import transforms
 
-from model_p2.fcn32 import FCN32
-from model_p2.resnet_fcn import ResnetFCN32
+from model_p2.vgg16_fcn32 import Vgg16FCN32
+from model_p2.resnet_fcn32 import ResnetFCN32
 from model_p2.image_dataset import ImageDataset
-from model_p2.metrics import mean_iou_score
-from model_p2.metrics import IOU
 from parse_config import create_parser
 from utils import save_checkpoint, load_checkpoint, progress_bar, experiment_record, save_mask
 from mean_iou_evaluate import mean_iou_score, read_masks
@@ -39,7 +38,7 @@ if __name__ == '__main__':
     total_steps = len(train_dataloader)
 
     # step 2: init network
-    net = FCN32()
+    net = ResnetFCN32()
 
     # step 3: define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
@@ -121,7 +120,8 @@ if __name__ == '__main__':
                     'uid': uid,
                     'miou': miou
                 }
-                save_checkpoint(checkpoint, configs.ckpt_path + "VGG16FCN32-{}.pt".format(uid[:8]))
+                save_checkpoint(checkpoint,
+                                os.path.join(configs.ckpt_path, "ResnetFCN32-{}.pt".format(uid[:8])))
                 # pre_val_miou = val_metrics.mean_iou
                 pre_val_miou = miou
                 best_epoch = epoch
