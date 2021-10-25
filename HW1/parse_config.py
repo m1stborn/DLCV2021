@@ -36,7 +36,7 @@ def create_parser():
     parser.add_argument(
         '--batch_size',
         type=int,
-        default=16,
+        default=32,
         help='Batch size for data loaders. (default: 32)'
     )
     parser.add_argument(
@@ -50,5 +50,19 @@ def create_parser():
         type=bool,
         default=False,
         help='Whether run the whole training data or only 1 batch per epoch. (default: False)'
+    )
+
+    parser.add_argument(
+        '--p2_input_dir',
+        type=str,
+        # TODO: remove last / for os.path.join
+        default='./p2_data/validation',
+        help='Where to save the predicted mask. (default: ./p2_predict)'
+    )
+    parser.add_argument(
+        '--p2_output_dir',
+        type=str,
+        default='./p2_predict',
+        help='Where to save the predicted mask. (default: ./p2_predict)'
     )
     return parser
