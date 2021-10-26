@@ -30,7 +30,7 @@ if __name__ == '__main__':
     # step 1: prepare dataset
     train_transforms = transforms.Compose([
         transforms.Resize(224),
-        transforms.RandomRotation(25),
+        # transforms.RandomRotation(25),
         # transforms.RandomResizedCrop(224),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
@@ -123,12 +123,13 @@ if __name__ == '__main__':
                 'net': net.state_dict(),
                 'epoch': epoch,
                 'optim': optimizer.state_dict(),
-                'uid': uid
+                'uid': uid,
+                'acc': (correct / total)
             }
             save_checkpoint(checkpoint,
-                            os.path.join(configs.ckpt_path, "vgg16-{}.pt".format(uid[:8])))
+                            os.path.join(configs.ckpt_path, "Resnet-{}.pt".format(uid[:8])))
             pre_val_acc = correct / total
-            best_epoch = epoch
+            best_epoch = epoch + 1
 
     # step 7: logging experiment
-    experiment_record(uid, time.ctime(), best_epoch, pre_val_acc)
+    experiment_record(uid, time.ctime(), configs.batch_size, configs.lr, best_epoch, pre_val_acc)

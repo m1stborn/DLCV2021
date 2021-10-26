@@ -3,7 +3,7 @@ import argparse
 
 def create_parser():
     parser = argparse.ArgumentParser()
-
+    # basic parameters
     parser.add_argument(
         '--lr',
         type=float,
@@ -50,6 +50,19 @@ def create_parser():
         type=bool,
         default=False,
         help='Whether run the whole training data or only 1 batch per epoch. (default: False)'
+    )
+    # p1
+    parser.add_argument(
+        '--p1_train_dir',
+        type=str,
+        default='./p1_data/train_50',
+        help='Training Dataset dir. (default: ./p1_data/train_50)'
+    )
+    parser.add_argument(
+        '--p1_valid_dir',
+        type=str,
+        default='./p1_data/val_50',
+        help='Valid(or Test) Dataset dir. (default: ./p1_data/train_50)'
     )
 
     parser.add_argument(

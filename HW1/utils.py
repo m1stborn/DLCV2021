@@ -1,6 +1,5 @@
 import os
 import sys
-import shutil
 import numpy as np
 import skimage.io
 import torch
@@ -30,7 +29,7 @@ def progress_bar(count, total, prefix='', suffix=''):
 
 
 def experiment_record(*args):
-    with open("./ckpt/p2/log.txt", 'a') as f:
+    with open("./ckpt/log.txt", 'a') as f:
         print("""=======================================================
 UUID:       {}
 Time:       {}

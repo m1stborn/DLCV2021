@@ -19,7 +19,7 @@ class ImageDataset(Dataset):
         # read filename
         for i, filename in enumerate(os.listdir(self.root)):
             label = filename.split('_')[0]
-            self.filenames.append((self.root + filename, label))
+            self.filenames.append((os.path.join(self.root, filename), label))
 
         self.len = len(self.filenames)
 
