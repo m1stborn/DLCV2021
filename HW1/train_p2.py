@@ -9,7 +9,7 @@ from torchvision.transforms import transforms
 from model_p2.vgg16_fcn32 import Vgg16FCN32
 from model_p2.resnet_fcn32 import ResnetFCN32
 from model_p2.vgg16_fcn8 import Vgg16FCN8
-from model_p2.image_dataset import ImageDataset
+from model_p2.sat_image_dataset import SatImageDataset
 from parse_config import create_parser
 from utils import save_checkpoint, load_checkpoint, progress_bar, experiment_record, save_mask
 from mean_iou_evaluate import mean_iou_score, read_masks
@@ -28,13 +28,19 @@ if __name__ == '__main__':
     pre_val_miou = 0.0
 
     # step 1: prepare dataset
-    train_dataset = ImageDataset('./p2_data/train')
+    train_dataset = SatImageDataset('./p2_data/train')
     train_dataloader = DataLoader(train_dataset, batch_size=configs.batch_size,
                                   shuffle=True)
 
-    val_dataset = ImageDataset('./p2_data/validation')
+    val_dataset = SatImageDataset('./p2_data/validation')
+
+    report_pic_idx = [10, 97, 107]
+    report_dataset = torch.utils.data.Subset(val_dataset, report_pic_idx)
+    report_dataloader = DataLoader(report_dataset, batch_size=len(report_dataset), shuffle=False)
+    report_batch = next(iter(report_dataloader))
+
     val_dataloader = DataLoader(val_dataset, batch_size=configs.batch_size,
-                                shuffle=False, num_workers=0)
+                                shuffle=True)
 
     total_steps = len(train_dataloader)
 
@@ -69,6 +75,7 @@ if __name__ == '__main__':
 
     # step 6: main loop
     for epoch in range(start_epoch, start_epoch + configs.epochs):
+        net.train()
         running_loss = 0.0
         for i, data in enumerate(train_dataloader):
             inputs, labels = data[0].to(device), data[1].to(device)
@@ -92,6 +99,7 @@ if __name__ == '__main__':
                 break
 
         # print Valid mIoU per epoch
+        net.eval()
         with torch.no_grad():
             # val_metrics = IOU()
             for val_data in val_dataloader:
@@ -108,7 +116,7 @@ if __name__ == '__main__':
             #       .format(val_metrics.miou()))
 
             # TA's mIoU:
-            print('\n')
+            print('')
             pred = read_masks(configs.p2_output_dir)
             labels = read_masks(configs.p2_input_dir)
             miou = mean_iou_score(pred, labels)
@@ -126,6 +134,13 @@ if __name__ == '__main__':
                 # pre_val_miou = val_metrics.mean_iou
                 pre_val_miou = miou
                 best_epoch = epoch + 1
+
+            # report
+            rpt_images, rpt_labels, rpt_fn_prefix = report_batch[0].to(device), report_batch[1], report_batch[2]
+            rpt_outputs = net(rpt_images)
+            rpt_pred = torch.argmax(rpt_outputs, dim=1).cpu().numpy()
+            rpt_fn = ["{}-{}-epochs_{}".format(uid[:8], f, epoch) for f in rpt_fn_prefix]
+            save_mask('./report_images', rpt_pred, rpt_fn)
 
     # step 7: logging experiment
     experiment_record(uid, time.ctime(), configs.batch_size, configs.lr, best_epoch, pre_val_miou)

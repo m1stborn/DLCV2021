@@ -5,7 +5,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from model_p2.vgg16_fcn32 import Vgg16FCN32
-from model_p2.image_dataset import ImageDataset
+from model_p2.sat_image_dataset import SatImageDataset
 from parse_config import create_parser
 from utils import load_checkpoint
 from mean_iou_evaluate import mean_iou_score, read_masks
@@ -36,21 +36,22 @@ if __name__ == '__main__':
     configs = parser.parse_args()
 
     # TODO: chang file path to arg
-    val_dataset = ImageDataset(configs.p2_input_dir)
+    val_dataset = SatImageDataset(configs.p2_input_dir)
     val_dataloader = DataLoader(val_dataset, batch_size=configs.batch_size,
-                                shuffle=False, num_workers=0)
+                                shuffle=False)
 
     ckpt = load_checkpoint(configs.ckpt)
 
     net = Vgg16FCN32()
     net.load_state_dict(ckpt['net'])
+    net.eval()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('Using device:', device)
     net.to(device)
 
     with torch.no_grad():
-        val_metrics = IOU()
+        # val_metrics = IOU()
         for val_data in val_dataloader:
             images, labels, img_filenames_prefix = val_data[0].to(device), val_data[1], val_data[2]
             outputs = net(images)
