@@ -81,6 +81,7 @@ if __name__ == '__main__':
 
     # step 6: main loop
     for epoch in range(start_epoch, start_epoch + configs.epochs):
+        net.train()
         running_loss = 0.0
         for i, data in enumerate(train_dataloader):
             inputs, labels = data[0].to(device), data[1].to(device)
@@ -104,7 +105,7 @@ if __name__ == '__main__':
                 break
 
         # print Valid Accuracy per epoch
-        # TODO: with no grad?
+        net.eval()
         with torch.no_grad():
             correct = 0
             total = 0

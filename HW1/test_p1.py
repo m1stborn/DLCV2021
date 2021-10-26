@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
     val_dataset = ImageDataset(configs.p1_valid_dir, transform=val_transforms)
     val_dataloader = DataLoader(val_dataset, batch_size=configs.batch_size,
-                                shuffle=True)
+                                shuffle=False)
 
     ckpt = load_checkpoint(configs.ckpt)
 
