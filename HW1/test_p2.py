@@ -4,7 +4,7 @@ import skimage.io
 import torch
 from torch.utils.data import DataLoader
 
-from model_p2.fcn32 import FCN32
+from model_p2.vgg16_fcn32 import Vgg16FCN32
 from model_p2.image_dataset import ImageDataset
 from parse_config import create_parser
 from utils import load_checkpoint
@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     ckpt = load_checkpoint(configs.ckpt)
 
-    net = FCN32()
+    net = Vgg16FCN32()
     net.load_state_dict(ckpt['net'])
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

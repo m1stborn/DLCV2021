@@ -8,6 +8,7 @@ from torchvision.transforms import transforms
 
 from model_p2.vgg16_fcn32 import Vgg16FCN32
 from model_p2.resnet_fcn32 import ResnetFCN32
+from model_p2.vgg16_fcn8 import Vgg16FCN8
 from model_p2.image_dataset import ImageDataset
 from parse_config import create_parser
 from utils import save_checkpoint, load_checkpoint, progress_bar, experiment_record, save_mask
@@ -38,7 +39,7 @@ if __name__ == '__main__':
     total_steps = len(train_dataloader)
 
     # step 2: init network
-    net = ResnetFCN32()
+    net = Vgg16FCN8()
 
     # step 3: define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
@@ -124,7 +125,7 @@ if __name__ == '__main__':
                                 os.path.join(configs.ckpt_path, "ResnetFCN32-{}.pt".format(uid[:8])))
                 # pre_val_miou = val_metrics.mean_iou
                 pre_val_miou = miou
-                best_epoch = epoch
+                best_epoch = epoch + 1
 
     # step 7: logging experiment
-    experiment_record(uid, configs.batch_size, configs.lr, time.ctime(), best_epoch, pre_val_miou)
+    experiment_record(uid, time.ctime(), configs.batch_size, configs.lr, best_epoch, pre_val_miou)
