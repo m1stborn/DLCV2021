@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 from torchvision.transforms import transforms
 
 
-class ImageDataset(Dataset):
+class SatImageDataset(Dataset):
     def __init__(self, filepath, transform=None):
         self.filenames = []
         self.root = filepath
@@ -18,7 +18,8 @@ class ImageDataset(Dataset):
         if transform is not None:
             self.transform = transform
 
-        for i, img_filename in enumerate(os.listdir(self.root)):
+        files = [f for f in os.listdir(self.root) if f.endswith('.jpg')]
+        for i, img_filename in enumerate(files):
             file_prefix = img_filename.split('_')[0]
             mask_filename = os.path.join(self.root, file_prefix + '_mask.png')
             # TODO: remove file_prefix
@@ -60,12 +61,14 @@ def read_mask(filename):
 
 # TODO:remove for submission
 
-if __name__ == '__main__':
-    import numpy as np
-    train_dataset = ImageDataset('./p2_data/train')
-    imgs, masks, fn = train_dataset[3]
-    print(imgs.size(), masks.size(), fn)
+# if __name__ == '__main__':
+#
+#     import numpy as np
+#     train_dataset = SatImageDataset('./p2_data/validation')
+#     from torch.utils.data import DataLoader
+#     report_pic_idx = [10, 97, 107]
+#     report_dataset = torch.utils.data.Subset(train_dataset, report_pic_idx)
+#     report_dataloader = DataLoader(report_dataset, batch_size=len(report_dataset),shuffle=False)
+#     batch = next(iter(report_dataloader))
+#     print(batch[0].size(), batch[1].size(), batch[2])
 
-    for i in range(100):
-        image, m, fn = train_dataset[i]
-        print(np.unique(m.cpu().numpy()), fn)
