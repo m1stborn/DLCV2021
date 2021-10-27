@@ -29,7 +29,7 @@ def progress_bar(count, total, prefix='', suffix=''):
 
 
 def experiment_record(*args):
-    with open("./ckpt/log.txt", 'a') as f:
+    with open("./ckpt/p2/log.txt", 'a') as f:
         print("""=======================================================
 UUID:       {}
 Time:       {}
@@ -41,7 +41,7 @@ Result:
 =======================================================""".format(*args), file=f)
 
 
-def save_mask(filepath, pred, img_fn):
+def save_mask(filepath, pred, img_fn, mode='Train'):
     masks_rgb = np.empty((len(pred), 512, 512, 3))
     for i, p in enumerate(pred):
         masks_rgb[i, p == 0] = [0, 255, 255]
@@ -56,6 +56,8 @@ def save_mask(filepath, pred, img_fn):
         # TODO: for submission file name should be same as input
         # skimage.io.imsave(os.path.join(filepath, img_fn[i]), mask_rgb)
         # mask_fn = img_fn[i].split('_')[0] + '_mask.png'
-        mask_fn = img_fn[i] + '_mask.png'
-        skimage.io.imsave(os.path.join(filepath, mask_fn), mask_rgb, check_contrast=False)
-
+        if mode == 'Test':
+            skimage.io.imsave(os.path.join(filepath, img_fn[i]), mask_rgb, check_contrast=False)
+        else:
+            mask_fn = img_fn[i] + '_mask.png'
+            skimage.io.imsave(os.path.join(filepath, mask_fn), mask_rgb, check_contrast=False)

@@ -130,7 +130,7 @@ if __name__ == '__main__':
                     'miou': miou
                 }
                 save_checkpoint(checkpoint,
-                                os.path.join(configs.ckpt_path, "ResnetFCN32-{}.pt".format(uid[:8])))
+                                os.path.join(configs.ckpt_path, "Vgg16FCN8-{}.pt".format(uid[:8])))
                 # pre_val_miou = val_metrics.mean_iou
                 pre_val_miou = miou
                 best_epoch = epoch + 1
