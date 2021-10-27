@@ -6,12 +6,7 @@ class Vgg16FCN8(nn.Module):
     def __init__(self, num_classes=7):
         super(Vgg16FCN8, self).__init__()
         model = models.vgg16(pretrained=True)
-        # TODO: consider layer to freeze
-        # freeze pool 1 to pool 2
-        # for i in range(10):
-        #     for param in model.features[i].parameters():
-        #         param.requires_grad = False
-        # self.features = model.features  # output size [-1, 512, 16, 16]
+
         self.pool1_to_3 = nn.Sequential(*list(model.features[:17]))
 
         self.pool4 = nn.Sequential(*list(model.features[17:24]))
@@ -84,13 +79,11 @@ class Vgg16FCN8(nn.Module):
         return h
 
 
-# TODO:remove for submission
-
-if __name__ == '__main__':
-    """
-    Test if weights is correct after copy
-    """
-    from torchsummary import summary
+# if __name__ == '__main__':
+    # """
+    # Test if weights is correct after copy
+    # """
+    # from torchsummary import summary
 
     # net1 = models.vgg16(pretrained=True)
     # net1.to('cuda')
@@ -113,15 +106,17 @@ if __name__ == '__main__':
     #
     # print(torch.all(net2.features[0].weight.data.eq(net1.features[0].weight.data)))
     # output:true
-    """
-    Test if Vgg16FCN8 works correctly
-    """
-    import torch
+    # """
+    # Test if Vgg16FCN8 works correctly
+    # """
+    # import torch
 
-    net = Vgg16FCN8()
-    net.to("cuda")
-    inputs = torch.randn(1, 3, 512, 512).to(device='cuda')
-    out = net(inputs)
-    print(out.size())
-    from torchsummary import summary
-    summary(net, (3, 512, 512))
+    # net = Vgg16FCN8()
+    # net.to("cuda")
+    # inputs = torch.randn(1, 3, 512, 512).to(device='cuda')
+    # out = net(inputs)
+    # print(out.size())
+    # from torchsummary import summary
+    # summary(net, (3, 512, 512))
+
+    # print(net)

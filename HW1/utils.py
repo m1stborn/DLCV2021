@@ -53,9 +53,6 @@ def save_mask(filepath, pred, img_fn, mode='Train'):
         masks_rgb[i, p == 6] = [0, 0, 0]
     masks_rgb = masks_rgb.astype(np.uint8)
     for i, mask_rgb in enumerate(masks_rgb):
-        # TODO: for submission file name should be same as input
-        # skimage.io.imsave(os.path.join(filepath, img_fn[i]), mask_rgb)
-        # mask_fn = img_fn[i].split('_')[0] + '_mask.png'
         if mode == 'Test':
             skimage.io.imsave(os.path.join(filepath, img_fn[i]), mask_rgb, check_contrast=False)
         else:
