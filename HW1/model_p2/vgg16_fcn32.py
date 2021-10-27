@@ -2,11 +2,12 @@ import torch.nn as nn
 from torchvision import models
 
 
-class FCN32(nn.Module):
+class Vgg16FCN32(nn.Module):
     def __init__(self, num_classes=7):
-        super(FCN32, self).__init__()
+        super(Vgg16FCN32, self).__init__()
         model = models.vgg16(pretrained=True)
-        # TODO decide layer to freeze
+        # TODO: consider layer to freeze
+        # freeze pool 1 to pool 3
         for i in range(17):
             for param in model.features[i].parameters():
                 param.requires_grad = False

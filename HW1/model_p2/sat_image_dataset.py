@@ -41,6 +41,35 @@ class SatImageDataset(Dataset):
         return self.len
 
 
+class SatImageTestDataset(Dataset):
+    def __init__(self, filepath, transform=None):
+        self.filenames = []
+        self.root = filepath
+        self.transform = transforms.Compose(
+            [transforms.ToTensor(), transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))]
+        )
+
+        if transform is not None:
+            self.transform = transform
+
+        files = [f for f in os.listdir(self.root) if f.endswith('.jpg')]
+        for i, img_filename in enumerate(files):
+            self.filenames.append((os.path.join(self.root, img_filename), img_filename))
+
+        self.len = len(self.filenames)
+
+    def __getitem__(self, idx):
+
+        img_filename, origin_filename = self.filenames[idx]
+        img = Image.open(img_filename).convert("RGB")
+        img = self.transform(img)
+
+        return img, origin_filename
+
+    def __len__(self):
+        return self.len
+
+
 def read_mask(filename):
 
     mask = imageio.imread(os.path.join(filename))
