@@ -6,5 +6,6 @@
 *.iml
 *.jpg
 *.png
+*.pt
 out
 gen

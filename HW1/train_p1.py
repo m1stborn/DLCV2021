@@ -1,3 +1,4 @@
+import os
 import time
 import uuid
 import torch
@@ -30,14 +31,14 @@ if __name__ == '__main__':
     train_transforms = transforms.Compose([
         transforms.Resize(224),
         # transforms.RandomRotation(25),
-        transforms.RandomResizedCrop(224),
-        # transforms.RandomHorizontalFlip(),
+        # transforms.RandomResizedCrop(224),
+        transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
     ])
     val_transforms = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
+        transforms.Resize(224),
+        # transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
     ])
@@ -56,7 +57,7 @@ if __name__ == '__main__':
 
     # step 3: define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(net.parameters(), lr=configs.lr, momentum=0.9)
+    optimizer = torch.optim.SGD(filter(lambda x: x.requires_grad, net.parameters()), lr=configs.lr, momentum=0.9)
 
     # step 4: check if resume training
     start_epoch = 0
@@ -80,6 +81,7 @@ if __name__ == '__main__':
 
     # step 6: main loop
     for epoch in range(start_epoch, start_epoch + configs.epochs):
+        net.train()
         running_loss = 0.0
         for i, data in enumerate(train_dataloader):
             inputs, labels = data[0].to(device), data[1].to(device)
@@ -103,16 +105,18 @@ if __name__ == '__main__':
                 break
 
         # print Valid Accuracy per epoch
-        correct = 0
-        total = 0
-        for val_data in val_dataloader:
-            images, labels = val_data[0].to(device), val_data[1].to(device)
-            outputs = net(images)
-            _, predicted = torch.max(outputs.data, 1)
-            total += labels.size(0)
-            correct += (predicted == labels).sum().item()
-        print('\nValid ACC: {:.4f}'
-              .format(correct / total))
+        net.eval()
+        with torch.no_grad():
+            correct = 0
+            total = 0
+            for val_data in val_dataloader:
+                images, labels = val_data[0].to(device), val_data[1].to(device)
+                outputs = net(images)
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+            print('\nValid ACC: {:.4f}'
+                  .format(correct / total))
 
         # step 6: save checkpoint if better than previous
         if pre_val_acc < (correct / total):
@@ -120,10 +124,13 @@ if __name__ == '__main__':
                 'net': net.state_dict(),
                 'epoch': epoch,
                 'optim': optimizer.state_dict(),
-                'uid': uid
+                'uid': uid,
+                'acc': (correct / total)
             }
-            save_checkpoint(checkpoint, configs.ckpt_path+"vgg16-{}.pt".format(uid[:8]))
+            save_checkpoint(checkpoint,
+                            os.path.join(configs.ckpt_path, "Resnet-{}.pt".format(uid[:8])))
             pre_val_acc = correct / total
-            best_epoch = epoch
+            best_epoch = epoch + 1
 
-    experiment_record(uid, time.ctime(), best_epoch, pre_val_acc)
+    # step 7: logging experiment
+    experiment_record(uid, time.ctime(), configs.batch_size, configs.lr, best_epoch, pre_val_acc)

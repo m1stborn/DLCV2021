@@ -6,8 +6,11 @@ class PretrainedVGG16(nn.Module):
     def __init__(self, num_classes=50):
         super(PretrainedVGG16, self).__init__()
         model = models.vgg16(pretrained=True)
-        for param in model.parameters():
-            param.requires_grad = False
+        for i in range(17):
+            for param in model.features[i].parameters():
+                param.requires_grad = False
+        # for param in model.parameters():
+        #     param.requires_grad = False
         self.features = model.features
 
         self.avgpool = model.avgpool
@@ -26,5 +29,5 @@ class PretrainedVGG16(nn.Module):
         x = self.features(x)
         x = self.avgpool(x)
         x = x.view(x.size(0), 512 * 7 * 7)
-        out = self.classifier(x)
-        return out
+        x = self.classifier(x)
+        return x

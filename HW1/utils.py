@@ -1,7 +1,7 @@
 import os
-import shutil
-import numpy as np
 import sys
+import numpy as np
+import skimage.io
 import torch
 
 
@@ -24,16 +24,37 @@ def progress_bar(count, total, prefix='', suffix=''):
     sys.stdout.write(prefix + '[%s]-Step [%s/%s]-%s\r' % (bar, count, total, suffix))
     sys.stdout.flush()
 
-    if count == total:
-        print("\n")
+    # if count == total:
+    #     print("\n")
 
 
 def experiment_record(*args):
-    with open("./ckpt/log.txt", 'a') as f:
-        print("""============================================
-UUID: {}
-Time: {}
+    with open("./ckpt/p2/log.txt", 'a') as f:
+        print("""=======================================================
+UUID:       {}
+Time:       {}
+Batch size: {}
+Lr:         {} 
 Result:
-    Epoch: {}
-    Valid ACC: {}
-============================================""".format(*args), file=f)
+    Epoch:      {}
+    Valid ACC:  {}
+=======================================================""".format(*args), file=f)
+
+
+def save_mask(filepath, pred, img_fn, mode='Train'):
+    masks_rgb = np.empty((len(pred), 512, 512, 3))
+    for i, p in enumerate(pred):
+        masks_rgb[i, p == 0] = [0, 255, 255]
+        masks_rgb[i, p == 1] = [255, 255, 0]
+        masks_rgb[i, p == 2] = [255, 0, 255]
+        masks_rgb[i, p == 3] = [0, 255, 0]
+        masks_rgb[i, p == 4] = [0, 0, 255]
+        masks_rgb[i, p == 5] = [255, 255, 255]
+        masks_rgb[i, p == 6] = [0, 0, 0]
+    masks_rgb = masks_rgb.astype(np.uint8)
+    for i, mask_rgb in enumerate(masks_rgb):
+        if mode == 'Test':
+            skimage.io.imsave(os.path.join(filepath, img_fn[i]), mask_rgb, check_contrast=False)
+        else:
+            mask_fn = img_fn[i] + '_mask.png'
+            skimage.io.imsave(os.path.join(filepath, mask_fn), mask_rgb, check_contrast=False)
