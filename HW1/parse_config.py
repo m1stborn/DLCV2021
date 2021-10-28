@@ -62,7 +62,19 @@ def create_parser():
         '--p1_valid_dir',
         type=str,
         default='./p1_data/val_50',
-        help='Valid(or Test) Dataset dir. (default: ./p1_data/train_50)'
+        help='Valid(or Test) Dataset dir. (default: ./p1_data/val_50)'
+    )
+    parser.add_argument(
+        '--p1_input_dir',
+        type=str,
+        default='./p1_data/val_50',
+        help='Input Dataset dir. (default: ./p1_data/val_50)'
+    )
+    parser.add_argument(
+        '--p1_output_file',
+        type=str,
+        default='./p1_data/output.csv',
+        help='Input Dataset dir. (default: ./p1_data/val_50)'
     )
 
     parser.add_argument(

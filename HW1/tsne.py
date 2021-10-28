@@ -1,6 +1,8 @@
 import torch
+import itertools
 import numpy as np
 import matplotlib
+from matplotlib import markers
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
 from torch.utils.data import DataLoader
@@ -53,17 +55,26 @@ if __name__ == '__main__':
     val_label = torch.cat(val_label).cpu().numpy()
 
     # tSNE: reduce feature dim from 2048 to 2
-    tsne = TSNE(n_components=2, init='pca', random_state=1, perplexity=50)
+    tsne = TSNE(n_components=2, init='random', random_state=1, perplexity=40)
     x = tsne.fit_transform(val_pred)
 
-    norm = matplotlib.colors.Normalize(vmin=0.0, vmax=49.0)
-    cmap = matplotlib.cm.get_cmap('rainbow')
-
-    for i in np.unique(val_label):
-        mask = val_label == i
-        plt.scatter(x[mask, 0], x[mask, 1], label=i, color=cmap(norm(i)) )
-
-    plt.legend(bbox_to_anchor=(1.05, 1.0), loc='upper left', ncol=5)
+    # norm = matplotlib.colors.Normalize(vmin=0.0, vmax=49.0)
+    # cmap = matplotlib.cm.get_cmap('rainbow')
+    # plt.style.use('ggplot')
+    #
+    # for i in np.unique(val_label):
+    #     mask = val_label == i
+    #     plt.scatter(x[mask, 0], x[mask, 1], label=i, color=cmap(norm(i)) )
+    #
+    # plt.legend(bbox_to_anchor=(1.05, 1.0), loc='upper left', ncol=5)
     # plt.show()
 
-
+    plt.style.use('ggplot')
+    m_styles = markers.MarkerStyle.markers
+    N = 50
+    colormap = plt.cm.Dark2.colors  # Qualitative colormap
+    for i, (marker, color) in zip(range(N), itertools.product(m_styles, colormap)):
+        mask = val_label == i
+        plt.scatter(x[mask, 0], x[mask, 1], color=color, marker=marker, label=i)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., ncol=4)
+    plt.show()

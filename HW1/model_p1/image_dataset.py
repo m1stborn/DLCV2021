@@ -35,3 +35,29 @@ class ImageDataset(Dataset):
 
     def __len__(self):
         return self.len
+
+
+class ImageTestDataset(Dataset):
+    def __init__(self, filepath, transform=None):
+        self.filenames = []
+        self.root = filepath
+
+        if transform is not None:
+            self.transform = transform
+
+        # read filename
+        for i, filename in enumerate(os.listdir(self.root)):
+            self.filenames.append((os.path.join(self.root, filename), filename))
+
+        self.len = len(self.filenames)
+
+    def __getitem__(self, idx):
+
+        img_filename, origin_filename = self.filenames[idx]
+        img = Image.open(img_filename).convert("RGB")
+        img = self.transform(img)
+
+        return img, origin_filename
+
+    def __len__(self):
+        return self.len
