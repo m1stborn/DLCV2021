@@ -9,7 +9,6 @@ def create_parser():
         type=float,
         default=1e-3,
         help='Specify learning rate for optimizer. (default: 1e-3)')
-    # TODO: resume training
     parser.add_argument(
         '--resume',
         action='store_true',
@@ -80,7 +79,6 @@ def create_parser():
     parser.add_argument(
         '--p2_input_dir',
         type=str,
-        # TODO: remove last / for os.path.join
         default='./p2_data/validation',
         help='Where to save the predicted mask. (default: ./p2_predict)'
     )

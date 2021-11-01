@@ -71,8 +71,7 @@ class SatImageTestDataset(Dataset):
 
 
 def read_mask(filename):
-
-    mask = imageio.imread(os.path.join(filename))
+    mask = imageio.imread(os.path.join(filename))  # (512, 512, 3)
     mask = (mask >= 128).astype(int)
     mask = 4 * mask[:, :, 0] + 2 * mask[:, :, 1] + mask[:, :, 2]
 
@@ -87,7 +86,6 @@ def read_mask(filename):
 
     return out
 
-
 # TODO:remove for submission
 
 # if __name__ == '__main__':
@@ -100,4 +98,3 @@ def read_mask(filename):
 #     report_dataloader = DataLoader(report_dataset, batch_size=len(report_dataset),shuffle=False)
 #     batch = next(iter(report_dataloader))
 #     print(batch[0].size(), batch[1].size(), batch[2])
-

@@ -10,6 +10,7 @@ from model_p2.vgg16_fcn32 import Vgg16FCN32
 from model_p2.resnet_fcn32 import ResnetFCN32
 from model_p2.vgg16_fcn8 import Vgg16FCN8
 from model_p2.sat_image_dataset import SatImageDataset
+from model_p2.metrics import IOU
 from parse_config import create_parser
 from utils import save_checkpoint, load_checkpoint, progress_bar, experiment_record, save_mask
 from mean_iou_evaluate import mean_iou_score, read_masks
@@ -101,22 +102,22 @@ if __name__ == '__main__':
         # print Valid mIoU per epoch
         net.eval()
         with torch.no_grad():
-            # val_metrics = IOU()
+            val_metrics = IOU()
             for val_data in val_dataloader:
                 images, labels, img_fn_prefixs = val_data[0].to(device), val_data[1], val_data[2]
                 outputs = net(images)
                 predicted = torch.argmax(outputs, dim=1).cpu().numpy()
-                # val_metrics.batch_iou(predicted, labels.cpu().numpy())
+
+                val_metrics.batch_iou(predicted, labels.cpu().numpy())
 
                 # save predicted mask png file
                 save_mask(configs.p2_output_dir, predicted, img_fn_prefixs)
 
-            # val_metrics.update()
-            # print('\nValid mIoU: {:.4f}'
-            #       .format(val_metrics.miou()))
+            print('\nValid mIoU (me): {}'
+                  .format(val_metrics.miou()))
 
             # TA's mIoU:
-            print('')
+            # print('')
             pred = read_masks(configs.p2_output_dir)
             labels = read_masks(configs.p2_input_dir)
             miou = mean_iou_score(pred, labels)
@@ -140,7 +141,7 @@ if __name__ == '__main__':
             rpt_outputs = net(rpt_images)
             rpt_pred = torch.argmax(rpt_outputs, dim=1).cpu().numpy()
             rpt_fn = ["{}-{}-epochs_{}".format(uid[:8], f, epoch) for f in rpt_fn_prefix]
-            save_mask('./report_images', rpt_pred, rpt_fn)
+            save_mask('./test_miou', rpt_pred, rpt_fn)
 
     # step 7: logging experiment
     experiment_record(uid, time.ctime(), configs.batch_size, configs.lr, best_epoch, pre_val_miou)
