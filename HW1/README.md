@@ -51,7 +51,7 @@ A pytorch implementation of Vgg16 using pretrained model.
 
 | Validation image | 0010                                                          | 0097                                                          | 0107                                                          |
 | ------------------ | --------------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------- |
-| Satellite        |  |  |  |
+| Satellite        | ![image](image/0010_sat.jpg) | ![image](image/0097_sat.jpg)  |![image](image/0107_sat.jpg)   |
 | Epoch 1          |                                                               |                                                               |                                                               |
 | Epoch 10         |                                                               |                                                               |                                                               |
 | Epoch 20         |                                                               |                                                               |                                                               |
