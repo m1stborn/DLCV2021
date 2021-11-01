@@ -38,12 +38,6 @@ class IOU(object):
             self.tps[i] += tp
             self.unions[i] += (tp_fp + tp_fn - tp)
 
-    # def update(self):
-    #     for i in range(6):
-    #         if self.unions[i] != 0:
-    #             iou = self.tps[i] / self.unions[i]
-    #             self.mean_iou += iou/6
-
     def miou(self):
         mean_iou = 0
         for i in range(6):
