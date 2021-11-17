@@ -13,8 +13,8 @@ from utils import load_checkpoint, calculate_is_score
 from pytorch_fid.fid_score import calculate_fid_given_paths
 
 # step 0: fix random seed for reproducibility
-torch.manual_seed(10)
-torch.cuda.manual_seed(10)
+torch.manual_seed(1)
+torch.cuda.manual_seed(1)
 
 if __name__ == '__main__':
     # init configs from args
@@ -32,10 +32,11 @@ if __name__ == '__main__':
     netG.to(device)
 
     # random sample 1000 noise vector to generate 1000 images
-    fixed_noise = torch.randn(1000, 100, 1, 1, device=device)
+    # fixed_noise = torch.randn(1000, 100, 1, 1, device=device)
 
     # To reproduce same result, load noise from checkpoint
-    # fixed_noise = ckpt['noise']
+    fixed_noise = ckpt['noise']
+    print(ckpt['is_mean'],ckpt['is_std'])
 
     with torch.no_grad():
         # generate 1000 images

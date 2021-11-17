@@ -169,8 +169,8 @@ if __name__ == '__main__':
                         np.transpose(make_grid(fake.to("cuda"), padding=2, normalize=True).cpu(), (1, 2, 0))
                     )
                     plt.savefig(os.path.join('./p1_result/first_32_progress', "{}-Epoch_{}-Iters_{}.png".format(
-                        uid[:8], epoch+1, iters))
-                    )
+                        uid[:8], epoch + 1, iters))
+                                )
 
         # print IS score per epoch
         netG.eval()
@@ -178,22 +178,24 @@ if __name__ == '__main__':
 
             for i in range(1000):
                 img = netG(fixed_noise[i].unsqueeze(0))
-                img = img.squeeze(0).add(1).mul(255*0.5)
+                img = img.squeeze(0).add(1).mul(255 * 0.5)
                 img = img.cpu().numpy()
                 img = np.transpose(img, (1, 2, 0)).astype(np.uint8)
 
-                filename = os.path.join(configs.p1_output_temp, f'{str(i+1).zfill(4)}.png')
+                filename = os.path.join(configs.p1_output_temp, f'{str(i + 1).zfill(4)}.png')
                 skimage.io.imsave(filename, img, check_contrast=False)
 
             is_score_mean, is_score_std = calculate_is_score(configs.p1_output_temp)
 
-            path2 = './hw2_data/face/test'
-            fid = calculate_fid_given_paths([configs.p1_output_temp, path2], 50, 'cuda', 2048, 2)
-
-            print('\nIS: {} FID: {}'.format(is_score_mean, fid))
+            # path2 = './hw2_data/face/test'
+            # fid = calculate_fid_given_paths([configs.p1_output_temp, path2], 50, 'cuda', 2048, 2)
+            fid = 0
+            # print('\nIS: {} FID: {}'.format(is_score_mean, fid))
+            print('\nIS: {}'.format(is_score_mean))
 
             # save checkpoint
-            if is_score_mean > 2 and fid < prev_fid:
+            # if is_score_mean > 2 and fid < prev_fid:
+            if is_score_mean > 2 or (epoch+1) % 10 == 0:
                 checkpoint = {
                     'netD': netD.state_dict(),
                     'netG': netG.state_dict(),
@@ -203,21 +205,22 @@ if __name__ == '__main__':
                     'uid': uid,
                     'is_mean': is_score_mean,
                     'is_std': is_score_std,
-                    'fid': fid,
+                    # 'fid': fid,
                     'noise': fixed_noise,
                     'Gloss': G_losses,
                     'Dloss': D_losses,
                 }
 
                 save_checkpoint(checkpoint,
-                                os.path.join(configs.ckpt_path, "DCGAN-{}.pt".format(uid[:8])))
+                                os.path.join(configs.ckpt_path, "DCGAN-{}-E{}.pt".format(uid[:8], epoch+1)))
                 print(f'Epoch {epoch+1} Saved!')
                 prev_is_mean = is_score_mean
-                prev_fid = fid
+                # prev_fid = fid
                 best_epoch = epoch + 1
 
     experiment_record_p1("./ckpt/p1/p1_log.txt",
-                         uid, time.ctime(),
+                         uid,
+                         time.ctime(),
                          configs.batch_size,
                          configs.lr,
                          best_epoch,
