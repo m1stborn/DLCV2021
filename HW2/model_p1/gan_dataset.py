@@ -13,7 +13,7 @@ class GANDataset(Dataset):
 
         # print("Load file from :", filepath)
         for i, file in enumerate(self.file_list):
-            print("\r%d/%d" % (i, len(self.file_list)), end="")
+            # print("\r%d/%d" % (i, len(self.file_list)), end="")
             img = Image.open(os.path.join(filepath, file)).convert('RGB')
             self.images.append(img)
 

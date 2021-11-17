@@ -11,8 +11,8 @@ from parse_config import create_parser
 from utils import load_checkpoint, calculate_is_score
 
 # step 0: fix random seed for reproducibility
-torch.manual_seed(10)
-torch.cuda.manual_seed(10)
+torch.manual_seed(20)
+torch.cuda.manual_seed(20)
 
 if __name__ == '__main__':
     # init configs from args
@@ -40,7 +40,7 @@ if __name__ == '__main__':
             img = img.cpu().numpy()
             img = np.transpose(img, (1, 2, 0)).astype(np.uint8)
 
-            filename = os.path.join(configs.p1_output_dir, f"{i+1}.png".zfill(4))
+            filename = os.path.join(configs.p1_output_dir, f"{str(i+1).zfill(4)}.png")
             skimage.io.imsave(filename, img, check_contrast=False)
 
         # TODO: remove for submission
