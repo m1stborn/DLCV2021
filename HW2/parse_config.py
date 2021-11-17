@@ -74,6 +74,12 @@ def create_parser():
         default='./p1_result/1000_generated_images',
         help='Training Dataset dir. (default: ./p1_result/1000_generated_images)'
     )
+    parser.add_argument(
+        '--p1_output_temp',
+        type=str,
+        default='./p1_result/train',
+        help='Training Dataset dir. (default: ./p1_result/1000_generated_images)'
+    )
     # parser.add_argument(
     #     '--p1_valid_dir',
     #     type=str,

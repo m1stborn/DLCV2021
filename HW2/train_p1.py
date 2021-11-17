@@ -14,6 +14,8 @@ from model_p1.dcgan import Generator, Discriminator, weights_init
 from parse_config import create_parser
 from utils import save_checkpoint, load_checkpoint, progress_bar, experiment_record_p1, calculate_is_score
 
+from pytorch_fid.fid_score import calculate_fid_given_paths
+
 # step 0: fix random seed for reproducibility
 torch.manual_seed(1)
 torch.cuda.manual_seed(1)
@@ -26,11 +28,15 @@ if __name__ == '__main__':
     uid = str(uuid.uuid1())
     best_epoch = 0
     latent_size = 100
-    prev_fid = 0.0
+    prev_fid = 9223372036854775807
     prev_is_mean = 0.0
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('Using device:', device)
+
+    # - Create batch of latent vectors that we will use to visualize
+    # - the progression of the generator
+    fixed_noise = torch.randn(1000, 100, 1, 1, device=device)
 
     # step 1: prepare dataset
     train_dataset = FaceDataset(configs.p1_train_dir)
@@ -51,10 +57,6 @@ if __name__ == '__main__':
 
     # step 3: define loss function and optimizer
     criterion = nn.BCELoss()
-
-    # - Create batch of latent vectors that we will use to visualize
-    # - the progression of the generator
-    fixed_noise = torch.randn(1000, latent_size, 1, 1, device=device)
 
     # - Establish convention for real and fake labels during training
     real_label = 1.
@@ -166,8 +168,8 @@ if __name__ == '__main__':
                     plt.imshow(
                         np.transpose(make_grid(fake.to("cuda"), padding=2, normalize=True).cpu(), (1, 2, 0))
                     )
-                    plt.savefig(os.path.join(configs.p1_output_dir, "{}-Epoch_{}-Iters_{}.png".format(
-                        uid[:8], epoch, iters))
+                    plt.savefig(os.path.join('./p1_result/first_32_progress', "{}-Epoch_{}-Iters_{}.png".format(
+                        uid[:8], epoch+1, iters))
                     )
 
         # print IS score per epoch
@@ -179,17 +181,19 @@ if __name__ == '__main__':
                 img = img.squeeze(0).add(1).mul(255*0.5)
                 img = img.cpu().numpy()
                 img = np.transpose(img, (1, 2, 0)).astype(np.uint8)
-                skimage.io.imsave("./p1_result/{}.png".format(i), img, check_contrast=False)
 
-            is_score_mean, is_score_std = calculate_is_score()
+                filename = os.path.join(configs.p1_output_temp, f'{str(i+1).zfill(4)}.png')
+                skimage.io.imsave(filename, img, check_contrast=False)
 
-            # TODO calculate FID score
-            fid = 0
+            is_score_mean, is_score_std = calculate_is_score(configs.p1_output_temp)
 
-            print('\nIS: {}'.format(is_score_mean))
+            path2 = './hw2_data/face/test'
+            fid = calculate_fid_given_paths([configs.p1_output_temp, path2], 50, 'cuda', 2048, 2)
+
+            print('\nIS: {} FID: {}'.format(is_score_mean, fid))
 
             # save checkpoint
-            if is_score_mean > prev_is_mean:
+            if is_score_mean > 2 and fid < prev_fid:
                 checkpoint = {
                     'netD': netD.state_dict(),
                     'netG': netG.state_dict(),
@@ -200,10 +204,22 @@ if __name__ == '__main__':
                     'is_mean': is_score_mean,
                     'is_std': is_score_std,
                     'fid': fid,
+                    'noise': fixed_noise,
+                    'Gloss': G_losses,
+                    'Dloss': D_losses,
                 }
+
                 save_checkpoint(checkpoint,
                                 os.path.join(configs.ckpt_path, "DCGAN-{}.pt".format(uid[:8])))
-
+                print(f'Epoch {epoch+1} Saved!')
+                prev_is_mean = is_score_mean
+                prev_fid = fid
                 best_epoch = epoch + 1
 
-    experiment_record_p1(uid, time.ctime(), configs.batch_size, configs.lr, best_epoch, is_score_mean, fid)
+    experiment_record_p1("./ckpt/p1/p1_log.txt",
+                         uid, time.ctime(),
+                         configs.batch_size,
+                         configs.lr,
+                         best_epoch,
+                         is_score_mean,
+                         fid)

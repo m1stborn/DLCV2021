@@ -10,9 +10,11 @@ from model_p1.dcgan import Generator
 from parse_config import create_parser
 from utils import load_checkpoint, calculate_is_score
 
+from pytorch_fid.fid_score import calculate_fid_given_paths
+
 # step 0: fix random seed for reproducibility
-torch.manual_seed(20)
-torch.cuda.manual_seed(20)
+torch.manual_seed(10)
+torch.cuda.manual_seed(10)
 
 if __name__ == '__main__':
     # init configs from args
@@ -31,6 +33,9 @@ if __name__ == '__main__':
 
     # random sample 1000 noise vector to generate 1000 images
     fixed_noise = torch.randn(1000, 100, 1, 1, device=device)
+
+    # To reproduce same result, load noise from checkpoint
+    # fixed_noise = ckpt['noise']
 
     with torch.no_grad():
         # generate 1000 images
@@ -52,9 +57,13 @@ if __name__ == '__main__':
         plt.imshow(
             np.transpose(make_grid(first32_img, padding=2, normalize=True).cpu(), (1, 2, 0))
         )
-        plt.savefig(os.path.join(configs.p1_output_base, "First_32.png"))
+        plt.savefig(os.path.join(configs.p1_output_base, "First_32_2.png"))
 
     # TODO: remove for submission
     is_score_mean, is_score_std = calculate_is_score(configs.p1_output_dir)
-    print('IS mean: {} IS std: {}'.format(is_score_mean, is_score_std))
+
+    path2 = './hw2_data/face/test'
+    fid = calculate_fid_given_paths([configs.p1_output_dir, path2], 50, 'cuda', 2048, 2)
+
+    print('IS mean: {} IS std: {} FID: {}'.format(is_score_mean, is_score_std, fid))
 
