@@ -47,7 +47,7 @@ Result:
 =======================================================""".format(*args), file=f)
 
 
-def calculate_is_score(fp='./p1_result'):
+def calculate_is_score(fp='./train'):
     train_dataset = GANDataset(filepath=fp)
     is_score = inception_score(train_dataset, cuda=True, batch_size=32, resize=True, splits=10)
     return is_score

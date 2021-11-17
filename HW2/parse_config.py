@@ -12,7 +12,7 @@ def create_parser():
     parser.add_argument(
         '--beta1',
         type=float,
-        default=1e-3,
+        default=0.5,
         help='Specify learning rate for optimizer. (default: 1e-3)')
     parser.add_argument(
         '--resume',
@@ -20,9 +20,15 @@ def create_parser():
         help='If set resumes training from provided checkpoint. (default: None)'
     )
     parser.add_argument(
+        '--ckpt',
+        type=str,
+        default='./ckpt/DCGAN-cc02f2b1.pt',
+        help='Path to checkpoint to resume training. (default: "")'
+    )
+    parser.add_argument(
         '--ckpt_path',
         type=str,
-        default='./ckpt',
+        default='./ckpt/p1',
         help='Path for saving checkpoint. (default: "./ckpt")'
     )
     parser.add_argument(
@@ -34,7 +40,7 @@ def create_parser():
     parser.add_argument(
         '--batch_size',
         type=int,
-        default=128,
+        default=64,
         help='Batch size for data loaders. (default: 64)'
     )
     parser.add_argument(
@@ -57,10 +63,16 @@ def create_parser():
         help='Training Dataset dir. (default: ./hw_data/face/train)'
     )
     parser.add_argument(
+        '--p1_output_base',
+        type=str,
+        default='./p1_result',
+        help='Training Dataset dir. (default: ./p1_train_process)'
+    )
+    parser.add_argument(
         '--p1_output_dir',
         type=str,
-        default='./p1_train_process',
-        help='Training Dataset dir. (default: ./hw_data/face/train)'
+        default='./p1_result/1000_generated_images',
+        help='Training Dataset dir. (default: ./p1_result/1000_generated_images)'
     )
     # parser.add_argument(
     #     '--p1_valid_dir',
