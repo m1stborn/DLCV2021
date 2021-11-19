@@ -28,19 +28,19 @@ def create_parser():
     parser.add_argument(
         '--ckpt_path',
         type=str,
-        default='./ckpt/p1',
+        default='./ckpt/p2',
         help='Path for saving checkpoint. (default: "./ckpt")'
     )
     parser.add_argument(
         '--epochs',
         type=int,
-        default=20,
+        default=100,
         help='Number of training epochs. (default: 20)'
     )
     parser.add_argument(
         '--batch_size',
         type=int,
-        default=64,
+        default=125,
         help='Batch size for data loaders. (default: 64)'
     )
     parser.add_argument(
@@ -80,23 +80,31 @@ def create_parser():
         default='./p1_result/train',
         help='Training Dataset dir. (default: ./p1_result/1000_generated_images)'
     )
-    # parser.add_argument(
-    #     '--p1_valid_dir',
-    #     type=str,
-    #     default='./p1_data/val_50',
-    #     help='Valid(or Test) Dataset dir. (default: ./p1_data/val_50)'
-    # )
-    # parser.add_argument(
-    #     '--p1_input_dir',
-    #     type=str,
-    #     default='./p1_data/val_50',
-    #     help='Input Dataset dir. (default: ./p1_data/val_50)'
-    # )
-    # parser.add_argument(
-    #     '--p1_output_file',
-    #     type=str,
-    #     default='./p1_data/output.csv',
-    #     help='Input Dataset dir. (default: ./p1_data/val_50)'
-    # )
+
+    # p2
+    parser.add_argument(
+        '--p2_input_csv',
+        type=str,
+        default='./hw2_data/digits/mnistm/train.csv',
+        help='Training Dataset dir. (default: ./hw_data/face/train)'
+    )
+    parser.add_argument(
+        '--p2_input_dir',
+        type=str,
+        default='./hw2_data/digits/mnistm/train',
+        help='Training Dataset dir. (default: ./hw_data/face/train)'
+    )
+    parser.add_argument(
+        '--p2_output_temp',
+        type=str,
+        default='./p2_result/train',
+        help='Training Dataset dir. (default: ./hw_data/face/train)'
+    )
+    parser.add_argument(
+        '--p2_output_dir',
+        type=str,
+        default='./p2_result/1000_generated_images',
+        help='Training Dataset dir. (default: ./hw_data/face/train)'
+    )
 
     return parser

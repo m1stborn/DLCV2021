@@ -115,6 +115,7 @@ if __name__ == '__main__':
 
     # step 6: main loop
     #  Lists to keep track of progress
+    # TODO: modify iters for resume training
     img_list = []
     G_losses = []
     D_losses = []
@@ -144,9 +145,10 @@ if __name__ == '__main__':
             noise = np.random.normal(0, 1, (configs.batch_size, latent_size))
             label_onehot = np.zeros((configs.batch_size, num_classes))
             label_onehot[np.arange(configs.batch_size), label] = 1
-            noise[:, :num_classes] = label_onehot
-            noise = torch.from_numpy(noise).to(device).float()
+            noise[np.arange(configs.batch_size), :num_classes] = label_onehot[np.arange(configs.batch_size)]
+            noise = (torch.from_numpy(noise).to(device).float())
             noise = noise.view(configs.batch_size, latent_size, 1, 1)
+            c_label.data.resize_(configs.batch_size).copy_(torch.from_numpy(label))
 
             fake = netG(noise)
             s_label.fill_(fake_label)
@@ -161,6 +163,7 @@ if __name__ == '__main__':
             D_G_z1 = s_output.mean().item()
             # TODO:  errD = s_errD_real + s_errD_fake instead?
             errD = errD_real + errD_fake
+            # errD = s_errD_real + s_errD_real
 
             optimizerD.step()
 
@@ -210,34 +213,35 @@ if __name__ == '__main__':
                         uid[:8], epoch + 1, iters))
                                 )
 
-        # print IS score per epoch
-        # netG.eval()
+        # print Acc score per epoch
+        netG.eval()
         with torch.no_grad():
             # generate fake image at once
             fake_img = netG(fixed_noise)
             outputs = netDigit(fake_img)
             _, predicted = torch.max(outputs.data, 1)
+
+            # idx = sample_idx()
+            # print("\n", predicted[idx], fixed_noise_label[idx], idx)
+
             correct = (predicted == fixed_noise_label).sum().item()
 
-            # correct = 0
-            # for i in range(0, 1000, 100):
-            #     fake_img = netG(fixed_noise[i:i + 100])
-            #     fake_img = fake_img.add(1).mul(255 * 0.5)
-            #     outputs = netDigit(fake_img)
-            #     _, predicted = torch.max(outputs.data, 1)
-            #     correct += (predicted == fixed_noise_label[i:i + 100]).sum().item()
-            #     for j in range(100):
-            #         img = fake_img[j].squeeze(0).add(1).mul(255 * 0.5)
-            #         img = img.cpu().numpy()
-            #         img = np.transpose(img, (1, 2, 0)).astype(np.uint8)
-            #
-            #         filename = os.path.join(configs.p2_output_temp, f'{i}_{str(j + 1).zfill(3)}.png')
-            #         skimage.io.imsave(filename, img, check_contrast=False)
+            # save fake image one by one
+            counter = [0 for i in range(10)]
+
+            for i, (img, label) in enumerate(zip(fake_img, fixed_noise_label)):
+                label = label.item()
+                counter[label] += 1
+
+                img = img.squeeze(0).add(1).mul(255 * 0.5)
+                img = img.cpu().numpy()
+                img = np.transpose(img, (1, 2, 0)).astype(np.uint8)
+
+                filename = os.path.join(configs.p2_output_temp, f"{label}_{str(counter[label]).zfill(3)}.png")
+                skimage.io.imsave(filename, img, check_contrast=False)
 
             acc = correct / 1000
             print('\nACC on 1000 image: {:.4f}'.format(acc))
-
-
 
             if acc > prev_acc:
                 checkpoint = {
@@ -267,4 +271,4 @@ if __name__ == '__main__':
                          configs.batch_size,
                          configs.lr,
                          best_epoch,
-                         acc)
+                         prev_acc)

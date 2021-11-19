@@ -82,6 +82,8 @@ class Discriminator(nn.Module):
         return output.view(-1, 1).squeeze(1)
 
 
+# TODO:remove for submission
+
 if __name__ == '__main__':
     from torchsummary import summary
 
@@ -103,7 +105,7 @@ if __name__ == '__main__':
     netD.apply(weights_init)
     summary(netD, (3, 64, 64))
 
-    x = torch.randn(1, 3, 64, 64, device="cuda")
+    x = torch.randn(10, 3, 64, 64, device="cuda")
     print(x.size())
     print(netD(x).size())  # torch.Size([1])
     # print(netD(x).view(-1).size())

@@ -8,7 +8,9 @@ from model_p1.gan_dataset import GANDataset
 
 # TODO: remove this for submission
 import warnings
+
 warnings.simplefilter('ignore')
+
 
 def save_checkpoint(state, save_path: str):
     torch.save(state, save_path)
@@ -47,7 +49,28 @@ Result:
 =======================================================""".format(*args), file=f)
 
 
+def experiment_record_p2(fn, *args):
+    with open(fn, 'a') as f:
+        print("""=======================================================
+UUID:       {}
+Time:       {}
+Batch size: {}
+Lr:         {} 
+Result:
+    Epoch:  {}
+    ACC:     {}
+=======================================================""".format(*args), file=f)
+
+
 def calculate_is_score(fp='./train'):
     train_dataset = GANDataset(filepath=fp)
     is_score = inception_score(train_dataset, cuda=True, batch_size=32, resize=True, splits=10)
     return is_score
+
+
+def sample_idx():
+    idx = [i for i in range(10)]
+    idxs = []
+    for j in range(10):
+        idxs += ([e + 100 * j for e in idx])
+    return idxs
