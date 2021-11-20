@@ -7,7 +7,7 @@ def create_parser():
     parser.add_argument(
         '--lr',
         type=float,
-        default=2e-4,
+        default=1e-3,
         help='Specify learning rate for optimizer. (default: 2e-4)')
     parser.add_argument(
         '--beta1',
@@ -28,19 +28,19 @@ def create_parser():
     parser.add_argument(
         '--ckpt_path',
         type=str,
-        default='./ckpt/p2',
+        default='./ckpt/p3',
         help='Path for saving checkpoint. (default: "./ckpt")'
     )
     parser.add_argument(
         '--epochs',
         type=int,
-        default=100,
+        default=20,
         help='Number of training epochs. (default: 20)'
     )
     parser.add_argument(
         '--batch_size',
         type=int,
-        default=125,
+        default=64,
         help='Batch size for data loaders. (default: 64)'
     )
     parser.add_argument(
@@ -105,6 +105,14 @@ def create_parser():
         type=str,
         default='./p2_result/1000_generated_images',
         help='Training Dataset dir. (default: ./hw_data/face/train)'
+    )
+
+    # p3
+    parser.add_argument(
+        '--src_mode',
+        type=str,
+        default='mnistm',
+        help='Source domain name, should be mnistm, usps or svhn.'
     )
 
     return parser

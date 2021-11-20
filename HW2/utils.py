@@ -74,3 +74,29 @@ def sample_idx():
     for j in range(10):
         idxs += ([e + 100 * j for e in idx])
     return idxs
+
+
+def eval_net(net, data_loader, device, flag):
+    net.eval()
+    correct_class = 0
+    correct_domain = 0
+    total = 0
+    with torch.no_grad():
+        for data in data_loader:
+            images, labels = data[0].to(device), data[1].to(device)
+            size = len(images)
+            if flag == 'target':
+                labels_domain = torch.ones(size).long().to(device)
+            else:
+                labels_domain = torch.zeros(size).long().to(device)
+            class_output, domain_output = net(images, alpha=0)
+
+            _, predicted_class = torch.max(class_output.data, 1)
+            _, predicted_domain = torch.max(domain_output.data, 1)
+
+            correct_class += (predicted_class == labels).sum().item()
+            correct_domain += (predicted_domain == labels_domain).sum().item()
+
+            total += size
+
+    return correct_class / total, correct_domain / total
