@@ -71,12 +71,12 @@ class Discriminator(nn.Module):
             # state size. (ndf*2) x 16 x 16 => 7
 
             # TODO: remove one layer?
-            # nn.Conv2d(ndf * 2, ndf * 4, 3, 1, 1, bias=False),
-            # nn.BatchNorm2d(ndf * 4),
-            # nn.LeakyReLU(0.2, inplace=True),
-            # state size. (ndf*4) x 8 x 8 => 7
-            nn.Conv2d(ndf * 2, ndf * 4, 4, 2, 2, bias=False),
+            nn.Conv2d(ndf * 2, ndf * 4, 3, 1, 1, bias=False),
             nn.BatchNorm2d(ndf * 4),
+            nn.LeakyReLU(0.2, inplace=True),
+            # state size. (ndf*4) x 8 x 8 => 7
+            nn.Conv2d(ndf * 4, ndf * 8, 4, 2, 2, bias=False),
+            nn.BatchNorm2d(ndf * 8),
             nn.LeakyReLU(0.2, inplace=True),
             # state size. (ndf*8) x 4 x 4
             # nn.Conv2d(ndf * 8, 1, 4, 1, 0, bias=False),
@@ -84,12 +84,12 @@ class Discriminator(nn.Module):
         )
 
         self.adv = nn.Sequential(
-            nn.Linear(ndf * 4 * 16, 1),
+            nn.Linear(ndf * 8 * 16, 1),
             nn.Sigmoid()
         )
         #
         self.aux = nn.Sequential(
-            nn.Linear(ndf * 4 * 16, num_classes),
+            nn.Linear(ndf * 8 * 16, num_classes),
             nn.Softmax(dim=1)
         )
 
@@ -126,7 +126,7 @@ if __name__ == '__main__':
     # x = torch.randn((10, 100, 1, 1), device="cuda")
     # out = netG(x)
     # print(out.size())
-    import numpy as np
+    # import numpy as np
     # nb_label = 10
     # batch_size = 16
     # nz = 100

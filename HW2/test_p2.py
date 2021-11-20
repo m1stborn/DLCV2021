@@ -34,28 +34,28 @@ if __name__ == '__main__':
     fixed_noise_label = ckpt['noise_label']
 
     # TODO: remove for submission
-    # netDigit = Classifier()
-    # load_classifier_checkpoint("Classifier.pth", netDigit)
-    # netDigit.to(device)
-    # netDigit.eval()
+    netDigit = Classifier()
+    load_classifier_checkpoint("Classifier.pth", netDigit)
+    netDigit.to(device)
+    netDigit.eval()
 
     with torch.no_grad():
         fake = netG(fixed_noise).detach().cpu()
 
         # TODO: remove for submission
-        # outputs = netDigit(fake.to("cuda"))
-        # _, predicted = torch.max(outputs.data, 1)
-        #
-        # correct = (predicted == fixed_noise_label).sum().item()
-        # print(correct/1000)
-        #
-        # idx = sample_idx()
-        # plt.axis("off")
-        # plt.title("First 10 per digit")
-        # plt.imshow(
-        #     np.transpose(make_grid(fake[idx].to("cuda"), padding=2, normalize=True, nrow=10).cpu(), (1, 2, 0))
-        # )
-        # plt.savefig("./p2_result/First_10.png")
+        outputs = netDigit(fake.to("cuda"))
+        _, predicted = torch.max(outputs.data, 1)
+
+        correct = (predicted == fixed_noise_label).sum().item()
+        print(correct/1000)
+
+        idx = sample_idx()
+        plt.axis("off")
+        plt.title("First 10 per digit")
+        plt.imshow(
+            np.transpose(make_grid(fake[idx].to("cuda"), padding=2, normalize=True, nrow=10).cpu(), (1, 2, 0))
+        )
+        plt.savefig("./p2_result/First_10.png")
         # ------------------------------
 
         idx_count = [0 for i in range(10)]
