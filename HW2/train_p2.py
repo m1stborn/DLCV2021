@@ -221,9 +221,6 @@ if __name__ == '__main__':
             outputs = netDigit(fake_img)
             _, predicted = torch.max(outputs.data, 1)
 
-            # idx = sample_idx()
-            # print("\n", predicted[idx], fixed_noise_label[idx], idx)
-
             correct = (predicted == fixed_noise_label).sum().item()
 
             # save fake image one by one

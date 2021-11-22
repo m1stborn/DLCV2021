@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 from torchvision.transforms import transforms
 from itertools import cycle
 
-from model_p3.dann import DANN, Usps2Svhn
+from model_p3.dann import DANN
 from model_p3.digit_dataset import DigitDataset
 from parse_config import create_parser
 from utils import save_checkpoint, load_checkpoint, progress_bar, experiment_record_p2, eval_net
@@ -92,9 +92,6 @@ if __name__ == '__main__':
     total_steps = max(len(src_dataloader), len(tgt_dataloader))
     print(f'src len:{len(src_dataloader)}, tgt len:{len(tgt_dataloader)}')
 
-    test_dataset = DigitDataset(test_csv, test_dir)
-    test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=configs.batch_size,
-                                                  shuffle=True)
     test_src_dataset = DigitDataset(test_src_csv, test_src_dir)
     test_src_dataloader = torch.utils.data.DataLoader(test_src_dataset, batch_size=configs.batch_size,
                                                       shuffle=True)
@@ -104,7 +101,6 @@ if __name__ == '__main__':
 
     # step 3: define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
-    # lr = 0.01
     optimizer = torch.optim.SGD(net.parameters(), lr=configs.lr, momentum=0.9)
 
     # step 4: check if resume training
@@ -185,26 +181,25 @@ if __name__ == '__main__':
 
         # eval model
         train_acc, train_acc_domain = eval_net(net, tgt_dataloader, device, "target")
-        tgt_acc, tgt_acc_domain = eval_net(net, test_dataloader, device, "target")
         src_acc, src_acc_domain = eval_net(net, test_src_dataloader, device, "source")
         print('\nTrainAcc: {:.4f} TrainDomainAcc: {:.4f}'.format(train_acc, train_acc_domain))
-        print('TgtAcc: {:.4f} SrcAcc: {:.4f} TgtDomainAcc: {:.4f} SrcDomainAcc: {:.4f}'
-              .format(tgt_acc, src_acc, tgt_acc_domain, src_acc_domain))
+        print('SrcTestAcc: {:.4f}  SrcDomainAcc: {:.4f}'
+              .format(src_acc, src_acc_domain))
 
         # step 6: save checkpoint if better than previous
-        if tgt_acc > prev_acc:
+        if src_acc > prev_acc:
             checkpoint = {
                 'net': net.state_dict(),
                 'epoch': epoch,
                 'optim': optimizer.state_dict(),
                 'uid': uid,
-                'tgtacc': tgt_acc,
+                # 'tgtacc': tgt_acc,
                 'srcacc': src_acc,
             }
             save_checkpoint(checkpoint,
                             os.path.join(configs.ckpt_path, f"{configs.src_mode}-{uid[:8]}.pt"))
             print(f'Epoch {epoch + 1} Saved!')
-            prev_acc = tgt_acc
+            prev_acc = src_acc
             best_epoch = epoch + 1
 
             step_count += 1

@@ -51,20 +51,20 @@ if __name__ == '__main__':
 
         # TODO: remove for submission
         # generate first 32 images in one (grid)
-        first32_img = netG(fixed_noise[:32])
-        plt.figure(figsize=(8, 8))
-        plt.axis("off")
-        plt.title("First 32 generated images")
-        plt.imshow(
-            np.transpose(make_grid(first32_img, padding=2, normalize=True).cpu(), (1, 2, 0))
-        )
-        plt.savefig(os.path.join(configs.p1_output_base, "First_32_2.png"))
+        # first32_img = netG(fixed_noise[:32])
+        # plt.figure(figsize=(8, 8))
+        # plt.axis("off")
+        # plt.title("First 32 generated images")
+        # plt.imshow(
+        #     np.transpose(make_grid(first32_img, padding=2, normalize=True).cpu(), (1, 2, 0))
+        # )
+        # plt.savefig(os.path.join(configs.p1_output_base, "First_32_2.png"))
 
     # TODO: remove for submission
-    is_score_mean, is_score_std = calculate_is_score(configs.p1_output_dir)
-
-    path2 = './hw2_data/face/test'
-    fid = calculate_fid_given_paths([configs.p1_output_dir, path2], 50, 'cuda', 2048, 2)
-
-    print('IS mean: {} IS std: {} FID: {}'.format(is_score_mean, is_score_std, fid))
-
+    # is_score_mean, is_score_std = calculate_is_score(configs.p1_output_dir)
+    #
+    # path2 = './hw2_data/face/test'
+    # fid = calculate_fid_given_paths([configs.p1_output_dir, path2], 50, 'cuda', 2048, 2)
+    #
+    # print('IS mean: {} IS std: {} FID: {}'.format(is_score_mean, is_score_std, fid))
+    #
