@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
     # To reproduce same result, load noise from checkpoint
     fixed_noise = ckpt['noise']
-    print(ckpt['is_mean'],ckpt['is_std'])
+    print(ckpt['is_mean'], ckpt['is_std'])
 
     with torch.no_grad():
         # generate 1000 images

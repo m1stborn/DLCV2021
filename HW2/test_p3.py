@@ -32,7 +32,7 @@ if __name__ == '__main__':
         ckpt_filename = './ckpt/best/usps-21417126.pt'
 
     ckpt = load_checkpoint(ckpt_filename)
-
+    print(ckpt_filename, f"TgtAcc: {ckpt['tgtacc']} SrcAcc: {ckpt['srcacc']}")
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('Using device:', device)
 
@@ -46,24 +46,24 @@ if __name__ == '__main__':
                                  shuffle=False)
 
     # TODO: set to false for submission
-    valid_mode = True
-    if valid_mode:
-        mnist_test_csv = './hw2_data/digits/mnistm/test.csv'
-        svhn_test_csv = './hw2_data/digits/svhn/test.csv'
-        usps_test_csv = './hw2_data/digits/usps/test.csv'
-        if configs.tgt_domain == "mnistm":
-            valid_dataset = DigitDataset(mnist_test_csv, configs.p3_input_dir)
-        elif configs.tgt_domain == "usps":
-            valid_dataset = DigitDataset(usps_test_csv, configs.p3_input_dir)
-        elif configs.tgt_domain == "svhn":
-            valid_dataset = DigitDataset(svhn_test_csv, configs.p3_input_dir)
-        valid_dataloader = DataLoader(valid_dataset, batch_size=configs.batch_size,
-                                      shuffle=False)
-
-        train_acc, train_acc_domain = eval_net(net, valid_dataloader, device, "target")
-        print('TrainAcc: {:.4f} TrainDomainAcc: {:.4f}'.format(
-            train_acc, train_acc_domain
-        ))
+    # valid_mode = False
+    # if valid_mode:
+    #     mnist_test_csv = './hw2_data/digits/mnistm/test.csv'
+    #     svhn_test_csv = './hw2_data/digits/svhn/test.csv'
+    #     usps_test_csv = './hw2_data/digits/usps/test.csv'
+    #     if configs.tgt_domain == "mnistm":
+    #         valid_dataset = DigitDataset(mnist_test_csv, configs.p3_input_dir)
+    #     elif configs.tgt_domain == "usps":
+    #         valid_dataset = DigitDataset(usps_test_csv, configs.p3_input_dir)
+    #     elif configs.tgt_domain == "svhn":
+    #         valid_dataset = DigitDataset(svhn_test_csv, configs.p3_input_dir)
+    #     valid_dataloader = DataLoader(valid_dataset, batch_size=configs.batch_size,
+    #                                   shuffle=False)
+    #
+    #     train_acc, train_acc_domain = eval_net(net, valid_dataloader, device, "target")
+    #     print('TrainAcc: {:.4f} TrainDomainAcc: {:.4f}'.format(
+    #         train_acc, train_acc_domain
+    #     ))
 
     with torch.no_grad():
         # Testing:
