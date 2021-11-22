@@ -1,3 +1,5 @@
+from abc import ABC
+
 import torch
 import torch.nn as nn
 
@@ -67,9 +69,21 @@ class DANN(nn.Module):
         return class_out, domain_out
 
 
-class Classifier(nn.Module):
+class DigitClassifier(nn.Module):
     def __init__(self, num_classes=10):
-        super(Classifier, self).__init__()
+        super(DigitClassifier, self).__init__()
+        self.feature = nn.Sequential(
+            nn.Conv2d(3, 32, 5),
+            nn.BatchNorm2d(32),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2),
+
+            nn.Conv2d(32, 48, 5),
+            nn.BatchNorm2d(48),
+            nn.Dropout2d(),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2),
+        )
 
         self.classifier = nn.Sequential(
             nn.Linear(48 * 4 * 4, 100),
@@ -84,41 +98,34 @@ class Classifier(nn.Module):
         )
 
     def forward(self, x):
-        # TODO: decide take in flatten or not
-        # x = x.view(-1, 48 * 4 * 4)
-        out = self.classifier(x)
-        return out
+        feat = self.feature(x)
+        feat = feat.view(-1, 48 * 4 * 4)
+
+        class_out = self.classifier(feat)
+
+        return class_out
 
 
-class Discriminator(nn.Module):
-    def __init__(self):
-        super(Discriminator, self).__init__()
-        self.discriminator = nn.Sequential(
-            nn.Linear(48 * 4 * 4, 100),
-            nn.BatchNorm1d(100),
-            nn.ReLU(inplace=True),
-            nn.Linear(100, 2),
-        )
+class ExtractedDANN(DANN):
+    def __init__(self, num_classes=10):
+        super().__init__(num_classes)
 
     def forward(self, x, alpha):
-        # TODO: decide take in flatten or not
-        out = GradReverse.grad_reverse(x, alpha)
-        out = self.discriminator(out)
-        return out
+        feat = self.feature(x)
+        feat = feat.view(-1, 48 * 4 * 4)
+        return feat
 
 
 if __name__ == '__main__':
     from torchsummary import summary
-    net = DANN()
-    net.to("cuda")
+
+    # net = Usps2Svhn()
+    # net.to("cuda")
     # summary(net, (3, 28, 28))
-    r = torch.randn((10, 3, 28, 28), device="cuda")
-    d, c = net(r, alpha=0.5)
+    # r = torch.randn((10, 3, 28, 28), device="cuda")
+    # a, b = net(r, alpha=0.5)
 
-    print(d.size(), c.size())
-    print(d, c)
-
-    # criterion = nn.CrossEntropyLoss()
+    # print(out.size())
 
     # classifier = Classifier()
     # classifier.to("cuda")
@@ -131,5 +138,8 @@ if __name__ == '__main__':
     # # summary(dis, (48*4*4,))
     # r = torch.randn((10, 48 * 4 * 4), device="cuda")
     # print(dis(r, alpha=0.5).size())
-
-
+    net = DigitClassifier()
+    net.to("cuda")
+    summary(net, (3, 28, 28))
+    r = torch.randn((10, 3, 28, 28), device="cuda")
+    print(net(r).size())

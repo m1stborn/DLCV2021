@@ -88,29 +88,29 @@ if __name__ == '__main__':
     from torchsummary import summary
 
     netG = Generator()
-    netG.to("cuda")
-    netG.apply(weights_init)
-    summary(netG, (100, 1, 1))
+    # netG.to("cuda")
+    # netG.apply(weights_init)
+    # summary(netG, (100, 1, 1))
 
-    z = torch.randn(1, 100, 1, 1, device="cuda")
-    print(z.size())
-    print(netG(z).size())
+    # z = torch.randn(1, 100, 1, 1, device="cuda")
+    # print(z.size())
+    # print(netG(z).size())
     # out = netG(z).cpu().detach()
     # out_denorm = out.add(1).mul(255).mul(0.5)
     # print(torch.max(out), torch.min(out))
     # print(torch.max(out_denorm), torch.min(out_denorm))
 
     netD = Discriminator()
-    netD.to("cuda")
-    netD.apply(weights_init)
-    summary(netD, (3, 64, 64))
+    # netD.to("cuda")
+    # netD.apply(weights_init)
+    # summary(netD, (3, 64, 64))
 
-    x = torch.randn(10, 3, 64, 64, device="cuda")
-    print(x.size())
-    print(netD(x).size())  # torch.Size([1])
+    # x = torch.randn(10, 3, 64, 64, device="cuda")
+    # print(x.size())
+    # print(netD(x).size())  # torch.Size([1])
     # print(netD(x).view(-1).size())
 
-    noise = torch.randn(1000, 100, 1, 1, device="cuda")
+    # noise = torch.randn(1000, 100, 1, 1, device="cuda")
     # for i in range(1000):
     #     img = netG(noise[i].unsqueeze(0))
     #     img = img.squeeze(0).add(1).mul(255).mul(0.5)
@@ -119,3 +119,5 @@ if __name__ == '__main__':
     #     img = img.astype(np.uint8)
     #     skimage.io.imsave("./test/{}.png".format(i), img, check_contrast=False)
     #
+    print(netG)
+    print(netD)

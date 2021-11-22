@@ -34,7 +34,7 @@ def create_parser():
     parser.add_argument(
         '--epochs',
         type=int,
-        default=20,
+        default=30,
         help='Number of training epochs. (default: 20)'
     )
     parser.add_argument(
@@ -113,6 +113,24 @@ def create_parser():
         type=str,
         default='mnistm',
         help='Source domain name, should be mnistm, usps or svhn.'
+    )
+    parser.add_argument(
+        '--tgt_domain',
+        type=str,
+        default='mnistm',
+        help='Target domain name, should be mnistm, usps or svhn.'
+    )
+    parser.add_argument(
+        '--p3_input_dir',
+        type=str,
+        default='./hw2_data/digits/mnistm/train',
+        help='Training Dataset dir. (default: ./hw_data/face/train)'
+    )
+    parser.add_argument(
+        '--p3_output_file',
+        type=str,
+        default='./p3_result/mnistm.csv',
+        help='Predict file.'
     )
 
     return parser

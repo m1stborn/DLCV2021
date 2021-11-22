@@ -112,14 +112,14 @@ class Discriminator(nn.Module):
 if __name__ == '__main__':
     from torchsummary import summary
     netD = Discriminator()
-    netD.to("cuda")
-    netD.apply(weights_init)
-    summary(netD, (3, 28, 28))
-    x = torch.randn((10, 3, 28, 28), device="cuda")
-    out1, out2 = netD(x)
-    print(out1.size(), out2.size())
+    # netD.to("cuda")
+    # netD.apply(weights_init)
+    # summary(netD, (3, 28, 28))
+    # x = torch.randn((10, 3, 28, 28), device="cuda")
+    # out1, out2 = netD(x)
+    # print(out1.size(), out2.size())
 
-    # netG = Generator()
+    netG = Generator()
     # netG.to("cuda")
     # netG.apply(weights_init)
     # summary(netG, (100, 1, 1))
@@ -149,3 +149,5 @@ if __name__ == '__main__':
     # for i in range(0, 1000, 100):
     #     # print(i, i+100)
     #     print(lst[i:i+100])
+    print(netG)
+    print(netD)

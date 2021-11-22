@@ -1,14 +1,14 @@
 import os
 import time
 import uuid
-import skimage.io
 import torch
 import numpy as np
 import torch.nn as nn
 from torch.utils.data import DataLoader
+from torchvision.transforms import transforms
 from itertools import cycle
 
-from model_p3.dann import DANN
+from model_p3.dann import DANN, Usps2Svhn
 from model_p3.digit_dataset import DigitDataset
 from parse_config import create_parser
 from utils import save_checkpoint, load_checkpoint, progress_bar, experiment_record_p2, eval_net
@@ -29,6 +29,12 @@ if __name__ == '__main__':
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print('Using device:', device)
+
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.5),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    ])
 
     # step 1: prepare dataset
     # MNIST-M → USPS / SVHN → MNIST-M / USPS → SVHN
@@ -74,6 +80,8 @@ if __name__ == '__main__':
         test_csv = svhn_test_csv
 
     src_dataset = DigitDataset(src_csv, src_dir)
+    if configs.src_mode == "usps":
+        src_dataset = DigitDataset(src_csv, src_dir, transform=transform)
     src_dataloader = torch.utils.data.DataLoader(src_dataset, batch_size=configs.batch_size,
                                                  shuffle=True)
 
@@ -82,7 +90,7 @@ if __name__ == '__main__':
                                                  shuffle=True)
 
     total_steps = max(len(src_dataloader), len(tgt_dataloader))
-    print(f'src len:{len(src_dataloader)}, tge len:{len(tgt_dataloader)}')
+    print(f'src len:{len(src_dataloader)}, tgt len:{len(tgt_dataloader)}')
 
     test_dataset = DigitDataset(test_csv, test_dir)
     test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=configs.batch_size,
@@ -121,14 +129,14 @@ if __name__ == '__main__':
         net.train()
         running_loss = 0.0
         # TODO: cycle shorter dataloader
-        tgt_iter = iter(tgt_dataloader)
+        src_iter = iter(src_dataloader)
         step_count = 0
-        for i, src_data in enumerate(src_dataloader):
+        for i, tgt_data in enumerate(tgt_dataloader):
             try:
-                tgt_data = next(tgt_iter)
+                src_data = next(src_iter)
             except StopIteration:
-                tgt_iter = iter(tgt_dataloader)
-                tgt_data = next(tgt_iter)
+                src_iter = iter(src_dataloader)
+                src_data = next(src_iter)
 
             net.zero_grad()
             # setup hyper parameters

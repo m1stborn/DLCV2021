@@ -100,3 +100,23 @@ def eval_net(net, data_loader, device, flag):
             total += size
 
     return correct_class / total, correct_domain / total
+
+
+def eval_src_net(net, data_loader, device):
+    net.eval()
+    correct_class = 0
+    total = 0
+    with torch.no_grad():
+        for data in data_loader:
+            images, labels = data[0].to(device), data[1].to(device)
+            size = len(images)
+
+            class_output = net(images)
+
+            _, predicted_class = torch.max(class_output.data, 1)
+
+            correct_class += (predicted_class == labels).sum().item()
+
+            total += size
+
+    return correct_class / total
