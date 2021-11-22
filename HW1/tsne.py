@@ -72,7 +72,7 @@ if __name__ == '__main__':
     plt.style.use('ggplot')
     m_styles = markers.MarkerStyle.markers
     N = 50
-    colormap = plt.cm.Dark2.colors  # Qualitative colormap
+    colormap = plt.cm.tab10.colors  # Qualitative colormap
     for i, (marker, color) in zip(range(N), itertools.product(m_styles, colormap)):
         mask = val_label == i
         plt.scatter(x[mask, 0], x[mask, 1], color=color, marker=marker, label=i)
