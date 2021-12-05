@@ -5,7 +5,6 @@ import argparse
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from torchvision.transforms import transforms
 from pytorch_pretrained_vit import ViT
 
 from model_p1.dogcat_dataset import DogCatDataset
