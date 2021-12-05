@@ -11,19 +11,9 @@ from pytorch_pretrained_vit import ViT
 from model_p1.dogcat_dataset import DogCatDataset
 from parse_config import create_parser
 from utils import save_checkpoint, load_checkpoint, progress_bar, experiment_record_p1
-# TODO: use YAML
-# import yaml
-#
-# with open("./configs_p1.yaml", 'r') as f:
-#     cfg = yaml.load(f, Loader=yaml.SafeLoader)
-#     print(cfg['p1_train_dir'])
-
-# step 0: fix random seed for reproducibility
 
 torch.manual_seed(1)
 torch.cuda.manual_seed(1)
-
-parser = argparse.ArgumentParser(description='')
 
 if __name__ == '__main__':
     # init constants:
@@ -35,7 +25,6 @@ if __name__ == '__main__':
     pre_val_acc = 0.0
 
     # step 1: prepare dataset
-
     train_dataset = DogCatDataset('./hw3_data/p1_data/train')
     train_dataloader = DataLoader(train_dataset, batch_size=configs.batch_size,
                                   shuffle=True)
