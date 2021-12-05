@@ -10,7 +10,7 @@ class DogCatDataset(Dataset):
         self.filenames = []
         self.root = filepath
         self.transform = transforms.Compose([
-            transforms.Resize((224, 224)),
+            transforms.Resize((384, 384)),
             transforms.ToTensor(),
             # transforms.RandomHorizontalFlip(),
             # transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.5),
@@ -58,12 +58,11 @@ if __name__ == '__main__':
     # test pytorch_pretrained_vit
     from pytorch_pretrained_vit import ViT
 
-    net = ViT('B_16', pretrained=True, num_classes=37, num_heads=8, num_layers=6)
+    net = ViT('B_32', pretrained=True, num_classes=37, num_heads=8, num_layers=6)
     net.to("cuda")
     # B_16_imagenet1k: patch_size = 16, 1356.92 MB
     # B_32_imagenet1k: patch_size = 32, 1356.92 MB
-    # B_16:            patch_size = 16, 394.31 MB
-    # B_32:            patch_size = 16, 394.31 MB
+
     # from torchsummary import summary
-    # summary(net, (3, 224, 224))
+    # summary(net, (3, 384, 384))
     # print(net(imgs).size())
