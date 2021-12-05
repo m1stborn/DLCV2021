@@ -35,7 +35,7 @@ if __name__ == '__main__':
     total_steps = len(train_dataloader)
 
     # step 2: init network
-    net = ViT('B_32_imagenet1k', pretrained=True, num_classes=37, num_heads=8, num_layers=6)
+    net = ViT('B_16_imagenet1k', pretrained=True, num_classes=37, num_heads=8, num_layers=6)
     net.to("cuda")
 
     # step 3: define loss function and optimizer
