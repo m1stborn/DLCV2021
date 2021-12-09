@@ -58,5 +58,14 @@ def create_parser():
         type=str,
         default='/hw3_data/p1_data/val',
     )
-
+    parser.add_argument(
+        '--p1_input_dir',
+        type=str,
+        default='./hw3_data/p1_data/val',
+    )
+    parser.add_argument(
+        '--p1_output_file',
+        type=str,
+        default='./result/p1/result.csv',
+    )
     return parser
