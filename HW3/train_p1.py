@@ -4,6 +4,7 @@ import uuid
 import argparse
 import torch
 import torch.nn as nn
+from torchvision import transforms
 from torch.utils.data import DataLoader
 from pytorch_pretrained_vit import ViT
 
@@ -28,7 +29,13 @@ if __name__ == '__main__':
     train_dataloader = DataLoader(train_dataset, batch_size=configs.batch_size,
                                   shuffle=True)
 
-    val_dataset = DogCatDataset('./hw3_data/p1_data/val')
+    val_transform = transforms.Compose([
+        transforms.Resize((384, 384)),
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    ])
+
+    val_dataset = DogCatDataset('./hw3_data/p1_data/val', transform=val_transform)
     val_dataloader = DataLoader(val_dataset, batch_size=configs.batch_size,
                                 shuffle=False)
 

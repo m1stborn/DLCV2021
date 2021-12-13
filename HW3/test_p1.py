@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
         with open(configs.p1_output_file, 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(['image_name', 'label'])
+            writer.writerow(['filename', 'label'])
 
             for row in zip(test_filename, test_pred):
                 writer.writerow(row)

@@ -10,7 +10,9 @@ class DogCatDataset(Dataset):
         self.filenames = []
         self.root = filepath
         self.transform = transforms.Compose([
-            transforms.Resize((384, 384)),
+            # transforms.Resize((384, 384)),
+            transforms.RandomResizedCrop((384, 384)),
+            transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ])
