@@ -46,6 +46,9 @@ def euclidean_metric(a, b):
     a = a.unsqueeze(1).expand(n, m, -1)
     b = b.unsqueeze(0).expand(n, m, -1)
     logits = -((a - b) ** 2).sum(dim=2)
+    # since our goal is to minimize the loss
+    # => place negative sign to distance
+    # => the closer the distance, the smaller the loss
     return logits
 
 
