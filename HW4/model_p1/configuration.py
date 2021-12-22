@@ -12,8 +12,6 @@ class Config(object):
         # Basic
         self.device = 'cuda'
         self.n_worker = 4
-        # self.batch_size = 32
-        # self.checkpoint = './checkpoint.pth'
 
         # Model
         self.n_batch = 100
