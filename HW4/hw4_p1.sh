@@ -1,0 +1,1 @@
+python3 test_p1.py --test_csv $1 --test_data_dir $2 --test_case_csv $3 --output_csv $4

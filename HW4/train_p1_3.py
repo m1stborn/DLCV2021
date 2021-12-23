@@ -9,7 +9,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 
 from model_p1.configuration import Config
-from model_p1.convnet import Convnet
+from model_p1.convnet import Convnet, ParametricDist, cosine_similarity
 from model_p1.mini_imgae_dataset import *
 from utils import *
 
@@ -48,7 +48,7 @@ def parse_args():
     parser.add_argument('--exp1', action='store_true')
     parser.add_argument('--k', type=int, default=1)
 
-    parser.add_argument('--exp2', action='store_true')
+    parser.add_argument('--exp2', default='euclidean', type=str)
 
     return parser.parse_args()
 

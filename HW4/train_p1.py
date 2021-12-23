@@ -106,6 +106,8 @@ if __name__ == '__main__':
 
     # step 6: main loop
     for epoch in range(start_epoch, start_epoch + config.epochs):
+        # lr_scheduler.step()
+
         # Train
         net.train()
         train_loss = AverageMeter()
@@ -125,7 +127,7 @@ if __name__ == '__main__':
             # reshape proto to n_shot x n_way x feat_dim and mean
             proto = proto.reshape(config.n_shot, config.n_way, -1).mean(dim=0)  # n_way x feat_dim = 30 x 1600
 
-            logits = euclidean_metric(net(images_query), proto)  # (n_way * n_query) x n_way
+            logits = euclidean_metric(net(images_query), proto)  # (n_way * n_query) x n_way = 450 x 30
             loss = criterion(logits, query_label)
 
             # check below
@@ -179,6 +181,9 @@ if __name__ == '__main__':
 
         print('\nValid Acc: {:.4f}'.format(val_acc.item()))
 
+        if args.test_run:
+            break
+
         # step 6: save checkpoint if better than previous
         if pre_val_acc < val_acc.item():
             checkpoint = {
@@ -194,12 +199,10 @@ if __name__ == '__main__':
             pre_val_acc = val_acc.item()
             best_epoch = epoch + 1
 
-        if args.test_run:
-            break
-
     # step 7: logging experiment
-    experiment_record_p1('./ckpt/p1/p1_log.txt',
-                         uid,
-                         time.ctime(),
-                         best_epoch,
-                         pre_val_acc)
+    if not args.test_run:
+        experiment_record_p1('./ckpt/p1/p1_log.txt',
+                             uid,
+                             time.ctime(),
+                             best_epoch,
+                             pre_val_acc)

@@ -58,6 +58,9 @@ if __name__ == '__main__':
     best_epoch = 0
     pre_val_acc = 0.0
 
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print('Using device:', device)
+
     # step 1: prepare dataset
     train_dataset = MiniImageDataset(args.train_csv, args.train_data_dir)
 
@@ -78,10 +81,23 @@ if __name__ == '__main__':
 
     # step 2: init network
     net = Convnet()
+    net.to(device)
+
+    config.epochs = 50
+
+    distance = euclidean_metric
+    params = net.parameters()
+    if args.exp2 == 'cosine':
+        distance = cosine_similarity
+    elif args.exp2 == 'parametric':
+        distance = ParametricDist()
+        distance.to(device)
+        params = list(net.parameters()) + list(distance.parameters())
 
     # step 3: define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(net.parameters(), lr=config.lr)
+
+    optimizer = torch.optim.Adam(params, lr=config.lr)
     # optimizer = torch.optim.SGD(net.parameters(), lr=config.lr, momentum=0.9)
 
     # lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.5)
@@ -101,21 +117,7 @@ if __name__ == '__main__':
 
         print("Checkpoint restored, start from epoch {}.".format(start_epoch + 1))
 
-    # step 5: move Net to GPU if available
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print('Using device:', device)
-
-    net.to(device)
-
-    distance = euclidean_metric
-    config.epochs = 50
-    if args.exp2 == 'cosine':
-        distance = cosine_similarity
-    elif args.exp2 == 'parametric':
-        distance = ParametricDist()
-        distance.to(device)
-
-    # step 6: main loop
+    # step 5: main loop
     for epoch in range(start_epoch, start_epoch + config.epochs):
         # lr_scheduler.step()
 
@@ -138,7 +140,7 @@ if __name__ == '__main__':
             # reshape proto to n_shot x n_way x feat_dim and mean
             proto = proto.reshape(config.n_shot, config.n_way, -1).mean(dim=0)  # n_way x feat_dim = 30 x 1600
 
-            logits = euclidean_metric(net(images_query), proto)  # (n_way * n_query) x n_way = 450 x 30
+            logits = distance(net(images_query), proto)  # (n_way * n_query) x n_way = 450 x 30
             loss = criterion(logits, query_label)
 
             # check below

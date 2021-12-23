@@ -100,9 +100,9 @@ if __name__ == '__main__':
 
     dist = ParametricDist()
     output = dist(v1, v2)
-    print(output.size())
-    print(output[0])
-
+    # print(output.size())
+    # print(output[0])
+    print(dist)
     # output2 = euclidean_metric(v1, v2)
     # print(output2.size())
     # print(output2[0])

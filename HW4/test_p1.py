@@ -41,8 +41,11 @@ def parse_args():
 
 if __name__ == '__main__':
     # Init constants:
-    config = Config()
     args = parse_args()
+
+    val_n_shot = 1
+    val_n_way = 5
+    val_n_query = 15
 
     ckpt = load_checkpoint(args.ckpt)
     print(f"Ckpt ACC: {ckpt['acc']}")
@@ -56,13 +59,13 @@ if __name__ == '__main__':
     # Prepare dataset
     test_dataset = MiniImageTestDataset(args.test_csv, args.test_data_dir)
 
-    test_dataloader = DataLoader(test_dataset, batch_size=5 * (15 + 1), num_workers=config.n_worker,
+    test_dataloader = DataLoader(test_dataset, batch_size=5 * (15 + 1), num_workers=3,
                                  pin_memory=False, worker_init_fn=worker_init_fn,
                                  sampler=GeneratorSampler(args.test_case_csv))
     test_pred = []
     for i, batch in enumerate(test_dataloader):
         images, labels = batch[0].to(device), batch[1]
-        p = config.val_n_shot * config.val_n_way
+        p = val_n_shot * val_n_way
         support_input, query_input = images[:p], images[p:]
 
         label_encoder = {labels[i * 1]: i for i in range(p)}
@@ -72,7 +75,7 @@ if __name__ == '__main__':
             [label_encoder[class_name] for class_name in labels[:p]])
 
         proto = net(support_input)
-        proto = proto.reshape(config.val_n_shot, config.val_n_way, -1).mean(dim=0)  # n_way x feat_dim = 30 x 1600
+        proto = proto.reshape(val_n_shot, val_n_way, -1).mean(dim=0)  # n_way x feat_dim = 30 x 1600
 
         logits = euclidean_metric(net(query_input), proto)  # (n_way * n_query) x n_way
         _, predicted = torch.max(logits.data, 1)
