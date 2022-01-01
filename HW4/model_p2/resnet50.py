@@ -19,22 +19,22 @@ class Resnet(nn.Module):
 
         self.features = nn.Sequential(*list(model.children())[:-1])
 
-        # self.classifier = nn.Sequential(
-        #     nn.Linear(2048, self.hidden_dim),
-        #     nn.BatchNorm1d(self.hidden_dim),
-        #     nn.ReLU(inplace=True),
-        #     nn.Linear(self.hidden_dim, self.num_classes)
-        # )
-
         self.classifier = nn.Sequential(
             nn.Linear(2048, self.hidden_dim),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(self.hidden_dim, self.hidden_dim),
-            nn.ReLU(),
-            nn.Dropout(0.5),
+            nn.BatchNorm1d(self.hidden_dim),
+            nn.ReLU(inplace=True),
             nn.Linear(self.hidden_dim, self.num_classes)
         )
+
+        # self.classifier = nn.Sequential(
+        #     nn.Linear(2048, self.hidden_dim),
+        #     nn.ReLU(),
+        #     nn.Dropout(0.5),
+        #     nn.Linear(self.hidden_dim, self.hidden_dim),
+        #     nn.ReLU(),
+        #     nn.Dropout(0.5),
+        #     nn.Linear(self.hidden_dim, self.num_classes)
+        # )
 
         # self.classifier = nn.Sequential(
         #     nn.Linear(2048, self.num_classes)
