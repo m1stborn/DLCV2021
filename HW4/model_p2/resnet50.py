@@ -23,6 +23,11 @@ class Resnet(nn.Module):
             nn.Linear(2048, self.hidden_dim),
             nn.BatchNorm1d(self.hidden_dim),
             nn.ReLU(inplace=True),
+
+            nn.Linear(self.hidden_dim, self.hidden_dim),
+            nn.BatchNorm1d(self.hidden_dim),
+            nn.ReLU(inplace=True),
+
             nn.Linear(self.hidden_dim, self.num_classes)
         )
 

@@ -80,6 +80,19 @@ if __name__ == '__main__':
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
 
+    # s = 0.5
+    # adv_transform = transforms.Compose([
+    #     transforms.RandomResizedCrop(128, scale=(0.2, 1.0)),
+    #     transforms.RandomApply(
+    #         [transforms.ColorJitter(0.8 * s, 0.8 * s, 0.8 * s, 0.2 * s)], p=0.8
+    #     ),
+    #     transforms.RandomGrayscale(p=0.2),
+    #     transforms.RandomHorizontalFlip(),
+    #     # transforms.RandomApply([transforms.GaussianBlur([0.1, 2.0])], p=0.5),
+    #     transforms.ToTensor(),
+    #     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    # ])
+
     train_dataset = ImageDataset(args.train_csv, args.train_data_dir, transform=transform)
     train_dataloader = DataLoader(train_dataset, batch_size=config.batch_size,
                                   shuffle=True)
@@ -118,6 +131,7 @@ if __name__ == '__main__':
         start_epoch = ckpt['epoch'] + 1
         optimizer.load_state_dict(ckpt['optim'])
         uid = ckpt['uid']
+        prev_val_acc = ckpt['acc']
         for state in optimizer.state.values():
             for k, v in state.items():
                 if torch.is_tensor(v):
