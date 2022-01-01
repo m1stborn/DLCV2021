@@ -40,6 +40,19 @@ Result:
 =======================================================""".format(*args), file=f)
 
 
+def experiment_record_p2_resnet(fn, *args):
+    with open(fn, 'a') as f:
+        print("""=======================================================
+UUID:       {}
+Time:       {}
+UseBackbone:{}
+Freeze:     {}
+Result:
+    Epoch:  {}
+    ACC:    {}
+=======================================================""".format(*args), file=f)
+
+
 def euclidean_metric(a, b):
     n = a.shape[0]
     m = b.shape[0]
