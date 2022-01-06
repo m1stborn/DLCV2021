@@ -10,7 +10,7 @@ from torchvision import transforms
 
 # mini-Imagenet dataset
 class ImageDataset(Dataset):
-    def __init__(self, csv_path, data_dir, transform=None):
+    def __init__(self, csv_path, data_dir, transform=None, name2label=None):
         self.data_dir = data_dir
         self.data_df = pd.read_csv(csv_path).set_index("id")
 
@@ -28,9 +28,11 @@ class ImageDataset(Dataset):
         self.filename = self.data_df["filename"].tolist()
         self.label = []
         self.name2label = dict()
-
-        for idx, label in enumerate(set(self.origin_label)):
-            self.name2label[label] = idx
+        if name2label is not None:
+            self.name2label = name2label
+        else:
+            for idx, label in enumerate(set(self.origin_label)):
+                self.name2label[label] = idx
 
         for origin_label in self.origin_label:
             self.label.append(self.name2label[origin_label])
@@ -52,14 +54,52 @@ class ImageDataset(Dataset):
         return self.len
 
 
+# mini-Imagenet dataset
+class ImageTestDataset(Dataset):
+    def __init__(self, csv_path, data_dir, transform=None, name2label=None):
+        self.data_dir = data_dir
+        self.data_df = pd.read_csv(csv_path)
+
+        self.transform = transforms.Compose([
+            transforms.Resize((128, 128)),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ])
+
+        if transform is not None:
+            self.transform = transform
+
+        # Encode name label to number label
+        self.origin_idx = self.data_df["id"].tolist()
+        self.origin_label = self.data_df["label"].tolist()
+        self.filename = self.data_df["filename"].tolist()
+
+        self.len = len(self.origin_idx)
+
+    def __getitem__(self, index):
+        idx = self.origin_idx[index]
+        img_filename = self.filename[index]
+
+        image = Image.open(os.path.join(self.data_dir, img_filename))
+        image = self.transform(image)
+
+        return image, img_filename, idx
+
+    def __len__(self):
+        return self.len
+
+
 if __name__ == '__main__':
     #  Train Dataset
-    train_dataset = ImageDataset('./hw4_data/mini/train.csv', './hw4_data/mini/train')
-    print(train_dataset.name2label)
-    print(train_dataset.num_classes)
+    # train_dataset = ImageDataset('./hw4_data/mini/train.csv', './hw4_data/mini/train')
+    # print(train_dataset.name2label)
+    # print(train_dataset.num_classes)
 
-    office_dataset = ImageDataset('./hw4_data/office/train.csv', './hw4_data/office/train')
+    # office_dataset = ImageDataset('./hw4_data/office/train.csv', './hw4_data/office/train')
 
-    print(office_dataset.name2label)
-    print(office_dataset.num_classes)
-    print(office_dataset[0][0].size(), office_dataset[0][1], office_dataset[0][2])
+    # print(office_dataset.name2label)
+    # print(office_dataset.num_classes)
+    # print(office_dataset[0][0].size(), office_dataset[0][1], office_dataset[0][2])
+
+    # Test Dataset
+    train_dataset = ImageTestDataset('./hw4_data/office/val.csv', './hw4_data/office/val')

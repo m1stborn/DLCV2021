@@ -35,6 +35,8 @@ def parse_args():
                         help="NOT to load pretrained resnet")
     parser.add_argument('--no_freeze', action='store_true',
                         help="NOT to load pretrained resnet")
+    parser.add_argument('--pretrained_sl', action='store_true',
+                        help="load TA pretrained model")
     # Path args
     parser.add_argument('--ckpt_path', default='./ckpt/p2', type=str,
                         help="Model checkpoint path")
@@ -81,7 +83,7 @@ if __name__ == '__main__':
     ])
 
     # s = 0.5
-    # adv_transform = transforms.Compose([
+    # transform = transforms.Compose([
     #     transforms.RandomResizedCrop(128, scale=(0.2, 1.0)),
     #     transforms.RandomApply(
     #         [transforms.ColorJitter(0.8 * s, 0.8 * s, 0.8 * s, 0.2 * s)], p=0.8
@@ -96,8 +98,10 @@ if __name__ == '__main__':
     train_dataset = ImageDataset(args.train_csv, args.train_data_dir, transform=transform)
     train_dataloader = DataLoader(train_dataset, batch_size=config.batch_size,
                                   shuffle=True)
+    # For reproducibility, save fix the name2label
+    name2label = train_dataset.name2label
 
-    val_dataset = ImageDataset(args.val_csv, args.val_data_dir)
+    val_dataset = ImageDataset(args.val_csv, args.val_data_dir, name2label=name2label)
     val_dataloader = DataLoader(val_dataset, batch_size=config.batch_size,
                                 shuffle=False)
 
@@ -105,12 +109,17 @@ if __name__ == '__main__':
 
     # step 2: Init network
     pretrained_net = None
-    if not args.no_pretrained:
+    if not args.no_pretrained and not args.pretrained_sl:
         # Load pretrained net from BYOL checkpoint
         print("Load pretrained resnet.")
         ckpt = load_checkpoint(args.ckpt)
         pretrained_net = models.resnet50(pretrained=False)
         pretrained_net.load_state_dict(ckpt['resnet'])
+    elif args.pretrained_sl:
+        print("TA pretrained resent")
+        pretrained_net = models.resnet50(pretrained=False)
+        ckpt = load_checkpoint(args.ckpt)
+        pretrained_net.load_state_dict(ckpt)
 
     net = Resnet(model=pretrained_net, num_classes=65, freeze=freeze)
     net.to(device)
@@ -167,9 +176,9 @@ if __name__ == '__main__':
 
         # Validation
         net.eval()
+        correct = 0
+        total = 0
         with torch.no_grad():
-            correct = 0
-            total = 0
             running_val_loss = 0.0
             for batch in val_dataloader:
                 images, labels = batch[0].to(device), batch[1].to(device)
@@ -196,7 +205,8 @@ if __name__ == '__main__':
                 'uid': uid,
                 'acc': (correct / total),
                 'pretrained': pretrained,
-                'freeze': freeze
+                'freeze': freeze,
+                'name2label': name2label
             }
             save_checkpoint(checkpoint,
                             os.path.join(args.ckpt_path, "Resnet-{}.pt".
