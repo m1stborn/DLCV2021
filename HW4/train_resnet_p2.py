@@ -51,8 +51,6 @@ def parse_args():
     parser.add_argument('--val_data_dir', default='./hw4_data/office/val', type=str,
                         help="Valid images directory")
 
-    parser.add_argument('--output_csv', default='./result/p1/train_output.csv', type=str, help="Output filename")
-
     return parser.parse_args()
 
 
@@ -111,10 +109,12 @@ if __name__ == '__main__':
     pretrained_net = None
     if not args.no_pretrained and not args.pretrained_sl:
         # Load pretrained net from BYOL checkpoint
-        print("Load pretrained resnet.")
+        print("Load pretrained resnet from BYOL.")
         ckpt = load_checkpoint(args.ckpt)
         pretrained_net = models.resnet50(pretrained=False)
         pretrained_net.load_state_dict(ckpt['resnet'])
+        print(ckpt['trlog'])
+        exit()
     elif args.pretrained_sl:
         print("TA pretrained resent")
         pretrained_net = models.resnet50(pretrained=False)

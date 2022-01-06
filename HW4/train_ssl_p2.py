@@ -39,9 +39,6 @@ def parse_args():
                         help="Training images directory")
     parser.add_argument('--output_csv', default='./result/p1/train_output.csv', type=str, help="Output filename")
 
-    # Experiment parameters
-    parser.add_argument('--exp2', default='euclidean', type=str)
-
     return parser.parse_args()
 
 
@@ -77,8 +74,6 @@ if __name__ == '__main__':
 
     resnet.to(device)
     net.to(device)
-    # from torchsummary import summary
-    # summary(resnet, (3, 128, 128))
 
     # step 3: Define loss function and optimizer
     optimizer = torch.optim.Adam(net.parameters(), lr=config.lr)
